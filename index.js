@@ -1,0 +1,72 @@
+require('dotenv').config()
+
+const app = require('./config/express')
+const passport = require('./config/passport')
+const connectDB = require('./config/database')
+const initCronJobs = require('./config/cron')
+const redis = require('./config/redis')
+const mongoose = require('mongoose')
+const routerGoogle = require('./routers/google')
+const routerGithub = require('./routers/github')
+const routerApi = require('./routers/app')
+const routerTournament = require('./routers/tournament')
+const routerBybit = require('./routers/bybit')
+const routerOrders = require('./routers/orders')
+const passportSetupGoogle = require('./passports/passportGoogle')
+const passportSetupGithub = require('./passports/passportGithub')
+const errorMiddleware = require('./middlewares/error-middleware')
+
+const PORT = process.env.PORT || 5001
+
+// Apply routes
+app.use('/api', routerApi)
+app.use('/auth', routerGoogle)
+app.use('/auth', routerGithub)
+app.use('/api', routerTournament)
+app.use('/api', routerBybit)
+app.use('/api', routerOrders)
+
+// Error handling middleware
+app.use(errorMiddleware)
+
+// Health check endpoint for Coolify
+app.get('/health', async (req, res) => {
+	try {
+		// Check MongoDB connection
+		await mongoose.connection.db.admin().ping()
+
+		// Check Redis connection
+		await redis.ping()
+
+		res.status(200).json({
+			status: 'healthy',
+			timestamp: new Date().toISOString(),
+			services: {
+				mongodb: 'connected',
+				redis: 'connected',
+			},
+		})
+	} catch (error) {
+		res.status(500).json({
+			status: 'unhealthy',
+			timestamp: new Date().toISOString(),
+			error: error.message,
+		})
+	}
+})
+
+// Start server
+const start = async () => {
+	try {
+		await connectDB()
+		await initCronJobs()
+
+		app.listen(PORT, () => {
+			console.log(`Successfully connected to Server on port ${PORT}!`)
+		})
+	} catch (e) {
+		console.log(e)
+	}
+}
+
+start()
