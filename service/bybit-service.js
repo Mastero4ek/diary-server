@@ -166,6 +166,56 @@ class BybitService {
 
 		return tickers
 	}
+
+	async getBybitWallet(language, keys) {
+		// Generate cache key based on API key
+		const cacheKey = `bybit_wallet:${keys.api}`
+
+		// Try to get data from cache if Redis is available
+		if (redis) {
+			try {
+				const cachedData = await redis.get(cacheKey)
+
+				if (cachedData) {
+					return JSON.parse(cachedData)
+				}
+			} catch (error) {
+				console.error('Redis cache read error:', error)
+				// Continue without cache if there's an error
+			}
+		}
+
+		const client = new RestClientV5({
+			testnet: false,
+			key: keys.api,
+			secret: keys.secret,
+		})
+
+		let wallet = {}
+
+		const response = await client.getWalletBalance({ accountType: 'UNIFIED' })
+
+		if (response.result.list && response.result.list[0].coin) {
+			const usdt = response.result.list[0].coin.find(
+				item => item.coin === 'USDT'
+			)
+
+			wallet.total_balance = Number(usdt.walletBalance).toFixed(4)
+			wallet.unrealised_pnl = Number(usdt.unrealisedPnl).toFixed(4)
+		}
+
+		// Cache the results if Redis is available
+		if (redis) {
+			try {
+				await redis.setex(cacheKey, 60, JSON.stringify(wallet)) // Cache for 1 minute
+			} catch (error) {
+				console.error('Redis cache write error:', error)
+				// Continue without caching if there's an error
+			}
+		}
+
+		return wallet
+	}
 }
 
 module.exports = new BybitService()

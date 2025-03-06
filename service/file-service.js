@@ -33,13 +33,11 @@ class FileService {
 		}
 	}
 
-	async removeCover(file_name, email, language) {
-		const user = await UserModel.findOne({ email })
+	async removeCover(file_name, userId, language) {
 		const file = await FileModel.findOneAndDelete({
-			user: user._id,
+			user: userId,
 			name: file_name,
 		})
-
 		if (!file)
 			return {
 				message: language === 'ru' ? 'Файл не найден!' : 'File not found!',
@@ -47,8 +45,8 @@ class FileService {
 
 		fs.unlinkSync('uploads/' + file.name)
 
-		const updateUser = await UserModel.findOneAndUpdate(
-			{ email },
+		await UserModel.findOneAndUpdate(
+			{ _id: userId },
 			{
 				$set: {
 					cover: null,

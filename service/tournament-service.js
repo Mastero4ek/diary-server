@@ -39,8 +39,8 @@ class TournamentService {
 		)
 	}
 
-	async addTournamentUser(exchange, email, language, page = 1, limit = 5) {
-		const user = await UserModel.findOne({ email })
+	async addTournamentUser(exchange, userId, language, page = 1, limit = 5) {
+		const user = await UserModel.findOne({ _id: userId })
 		const tournament = await TournamentModel.findOne({ exchange })
 
 		if (!tournament) {
@@ -61,7 +61,7 @@ class TournamentService {
 
 		const level = await LevelModel.findOne({ user: user._id })
 
-		const tournament_user = await TournamentUserModel.create({
+		await TournamentUserModel.create({
 			tournament: tournament._id,
 			id: user._id,
 			name: user.name,

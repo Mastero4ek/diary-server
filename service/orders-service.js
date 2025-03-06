@@ -4,23 +4,12 @@ const UserModel = require('../models/user-model')
 const ApiError = require('../exceptions/api-error')
 
 class OrdersService {
-	async savedOrder(language, email, order, exchange) {
-		const user = await UserModel.findOne({ email })
-
-		if (!user) {
-			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Пользователь с почтовым адресом ${email} не найден!`
-					: `User with email address ${email} not found!`
-			)
-		}
-
+	async savedOrder(language, userId, order, exchange) {
 		const existing_order = await OrderModel.findOne({
-			user: user._id,
+			user: userId,
 			exchange,
 			id: order.id,
 		})
-
 		if (existing_order) {
 			throw ApiError.BadRequest(
 				language === 'ru' ? `Ордер уже сохранен!` : `Order already saved!`
@@ -28,7 +17,7 @@ class OrdersService {
 		}
 
 		const new_order = await OrderModel.create({
-			user: user._id,
+			user: userId,
 			exchange,
 			id: order.id,
 			symbol: order.symbol,
@@ -47,23 +36,12 @@ class OrdersService {
 		return { order: order_dto }
 	}
 
-	async removedOrder(language, email, start_time, end_time, order, exchange) {
-		const user = await UserModel.findOne({ email })
-
-		if (!user) {
-			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Пользователь с почтовым адресом ${email} не найден!`
-					: `User with email address ${email} not found!`
-			)
-		}
-
+	async removedOrder(language, userId, start_time, end_time, order, exchange) {
 		const removed_order = await OrderModel.findOneAndDelete({
-			user: user._id,
+			user: userId,
 			exchange,
 			id: order.id,
 		})
-
 		if (!removed_order) {
 			throw ApiError.BadRequest(
 				language === 'ru'
@@ -73,7 +51,7 @@ class OrdersService {
 		}
 
 		const all_orders = await OrderModel.find({
-			user: user._id,
+			user: userId,
 			exchange,
 			closed_time: {
 				$gte: new Date(start_time).toISOString(),
@@ -90,19 +68,9 @@ class OrdersService {
 		return orders
 	}
 
-	async getBybitSavedOrders(language, email, start_time, end_time, exchange) {
-		const user = await UserModel.findOne({ email })
-
-		if (!user) {
-			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Пользователь с почтовым адресом ${email} не найден!`
-					: `User with email address ${email} not found!`
-			)
-		}
-
+	async getBybitSavedOrders(language, userId, start_time, end_time, exchange) {
 		const all_orders = await OrderModel.find({
-			user: user._id,
+			user: userId,
 			exchange,
 			closed_time: {
 				$gte: new Date(start_time).toISOString(),

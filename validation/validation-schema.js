@@ -234,6 +234,30 @@ const ValidationSchema = {
 			toInt: true,
 		},
 	},
+
+	wallet: {
+		email: {
+			exists: {
+				errorMessage: 'Email is required',
+			},
+			isEmail: {
+				errorMessage: 'Invalid email format',
+			},
+			normalizeEmail: true,
+		},
+		exchange: {
+			exists: {
+				errorMessage: 'Exchange is required',
+			},
+			isString: {
+				errorMessage: 'Exchange must be a string',
+			},
+			isIn: {
+				options: [['bybit', 'mexc', 'okx']],
+				errorMessage: 'Invalid exchange',
+			},
+		},
+	},
 }
 
 module.exports = ValidationSchema

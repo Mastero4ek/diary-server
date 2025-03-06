@@ -3,11 +3,12 @@ const keysService = require('../service/keys-service')
 class KeysController {
 	async updateKeys(req, res, next) {
 		try {
-			const { email, exchange, api, secret } = req.body
+			const { exchange, api, secret } = req.body
+			const user = req.user
 			const { language } = req.cookies
 
 			const keys = await keysService.updateKeys(
-				email,
+				user.id,
 				exchange,
 				api,
 				secret,

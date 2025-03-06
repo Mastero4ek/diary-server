@@ -266,21 +266,6 @@ class UserController {
 			next(e)
 		}
 	}
-
-	async verifyTempToken(req, res, next) {
-		try {
-			const { token } = req.body
-			if (!token) {
-				return next(ApiError.BadRequest('Token is required'))
-			}
-
-			const isValid = tokenService.validateAccessToken(token)
-
-			return res.json({ valid: !!isValid })
-		} catch (e) {
-			next(e)
-		}
-	}
 }
 
 module.exports = new UserController()

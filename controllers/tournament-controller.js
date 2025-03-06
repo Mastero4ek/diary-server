@@ -3,12 +3,13 @@ const tournamentService = require('../service/tournament-service')
 class TournamentController {
 	async addTournamentUser(req, res, next) {
 		try {
-			const { email, exchange } = req.body
+			const { exchange } = req.body
+			const user = req.user
 			const { language } = req.cookies
 
 			const bid_user = await tournamentService.addTournamentUser(
 				exchange,
-				email,
+				user.id,
 				language
 			)
 

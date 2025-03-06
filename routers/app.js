@@ -52,6 +52,4 @@ router.post(
 
 router.post('/create-keys', authMiddleware, keysController.updateKeys)
 
-router.post('/verify-temp-token', userController.verifyTempToken)
-
 module.exports = router

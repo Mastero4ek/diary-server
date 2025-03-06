@@ -8,7 +8,6 @@ const ValidationSchema = require('../validation/validation-schema')
 router.post(
 	'/bybit-orders-pnl',
 	authMiddleware,
-	checkSchema(ValidationSchema.orders),
 	bybitController.getBybitOrdersPnl
 )
 
@@ -18,5 +17,7 @@ router.post(
 	checkSchema(ValidationSchema.orders),
 	bybitController.getBybitTickers
 )
+
+router.post('/bybit-wallet', authMiddleware, bybitController.getBybitWallet)
 
 module.exports = router

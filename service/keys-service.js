@@ -4,9 +4,8 @@ const KeysDto = require('../dtos/keys-dto')
 const ApiError = require('../exceptions/api-error')
 
 class KeysService {
-	async findKeys(email, language) {
-		const user = await UserModel.findOne({ email })
-		const keys = await KeysModel.findOne({ user: user._id })
+	async findKeys(userId, language) {
+		const keys = await KeysModel.findOne({ user: userId })
 
 		if (!keys) {
 			throw ApiError.BadRequest(
@@ -19,10 +18,8 @@ class KeysService {
 		return keys
 	}
 
-	async updateKeys(email, exchange, api, secret, language) {
-		const user = await UserModel.findOne({ email })
-		const keys = await KeysModel.findOne({ user: user._id })
-
+	async updateKeys(userId, exchange, api, secret, language) {
+		const keys = await KeysModel.findOne({ user: userId })
 		if (!keys) {
 			throw ApiError.BadRequest(
 				language === 'ru'

@@ -2,33 +2,24 @@ const BybitService = require('../service/bybit-service')
 const KeysService = require('../service/keys-service')
 const Helpers = require('../helpers/helpers')
 const OrdersService = require('../service/orders-service')
-const UserModel = require('../models/user-model')
 const ApiError = require('../exceptions/api-error')
 
 class BybitController {
 	async getBybitOrdersPnl(req, res, next) {
 		try {
-			const { email, sort, search, page, limit, start_time, end_time } =
+			const { exchange, sort, search, page, limit, start_time, end_time } =
 				req.body
 			const { language } = req.cookies
+			const user = req.user
 
-			const user = await UserModel.findOne({ email })
-			if (!user) {
-				throw ApiError.BadRequest(
-					language === 'ru'
-						? `Пользователь с почтовым адресом ${email} не найден!`
-						: `User with email address ${email} not found!`
-				)
-			}
-
-			const keys = await KeysService.findKeys(email, language)
+			const keys = await KeysService.findKeys(user.id, language)
 			if (!keys || keys.message) {
 				throw ApiError.BadRequest(
 					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
 				)
 			}
 
-			const current_keys = keys.keys.find(item => item.name === 'bybit')
+			const current_keys = keys.keys.find(item => item.name === exchange)
 			if (!current_keys || !current_keys.api || !current_keys.secret) {
 				throw ApiError.BadRequest(
 					language === 'ru'
@@ -56,10 +47,10 @@ class BybitController {
 
 			const bookmarks = await OrdersService.getBybitSavedOrders(
 				language,
-				email,
+				user.id,
 				start_time,
 				end_time,
-				'bybit'
+				exchange
 			)
 
 			return res.json({
@@ -76,26 +67,18 @@ class BybitController {
 
 	async getBybitTickers(req, res, next) {
 		try {
-			const { email } = req.body
+			const { exchange } = req.body
+			const user = req.user
 			const { language } = req.cookies
 
-			const user = await UserModel.findOne({ email })
-			if (!user) {
-				throw ApiError.BadRequest(
-					language === 'ru'
-						? `Пользователь с почтовым адресом ${email} не найден!`
-						: `User with email address ${email} not found!`
-				)
-			}
-
-			const keys = await KeysService.findKeys(email, language)
+			const keys = await KeysService.findKeys(user.id, language)
 			if (!keys || keys.message) {
 				throw ApiError.BadRequest(
 					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
 				)
 			}
 
-			const current_keys = keys.keys.find(item => item.name === 'bybit')
+			const current_keys = keys.keys.find(item => item.name === exchange)
 			if (!current_keys || !current_keys.api || !current_keys.secret) {
 				throw ApiError.BadRequest(
 					language === 'ru'
@@ -107,6 +90,36 @@ class BybitController {
 			const tickers = await BybitService.getBybitTickers(language, current_keys)
 
 			return res.json(tickers)
+		} catch (e) {
+			next(e)
+		}
+	}
+
+	async getBybitWallet(req, res, next) {
+		try {
+			const { exchange } = req.body
+			const { language } = req.cookies
+			const user = req.user
+
+			const keys = await KeysService.findKeys(user.id, language)
+			if (!keys || keys.message) {
+				throw ApiError.BadRequest(
+					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
+				)
+			}
+
+			const current_keys = keys.keys.find(item => item.name === exchange)
+			if (!current_keys || !current_keys.api || !current_keys.secret) {
+				throw ApiError.BadRequest(
+					language === 'ru'
+						? 'Ключи Bybit не настроены!'
+						: 'Bybit keys are not configured!'
+				)
+			}
+
+			const wallet = await BybitService.getBybitWallet(language, current_keys)
+
+			return res.json(wallet)
 		} catch (e) {
 			next(e)
 		}

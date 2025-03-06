@@ -4,12 +4,13 @@ const OrdersService = require('../service/orders-service')
 class OrdersController {
 	async savedOrder(req, res, next) {
 		try {
-			const { email, order, exchange } = req.body
+			const { order, exchange } = req.body
+			const user = req.user
 			const { language } = req.cookies
 
 			const new_order = await OrdersService.savedOrder(
 				language,
-				email,
+				user.id,
 				order,
 				exchange
 			)
@@ -23,7 +24,6 @@ class OrdersController {
 	async removedOrder(req, res, next) {
 		try {
 			const {
-				email,
 				order,
 				exchange,
 				page,
@@ -34,10 +34,11 @@ class OrdersController {
 				end_time,
 			} = req.body
 			const { language } = req.cookies
+			const user = req.user
 
 			const orders = await OrdersService.removedOrder(
 				language,
-				email,
+				user.id,
 				start_time,
 				end_time,
 				order,
@@ -67,21 +68,14 @@ class OrdersController {
 
 	async getBybitSavedOrders(req, res, next) {
 		try {
-			const {
-				email,
-				sort,
-				search,
-				page,
-				limit,
-				start_time,
-				end_time,
-				exchange,
-			} = req.body
+			const { sort, search, page, limit, start_time, end_time, exchange } =
+				req.body
 			const { language } = req.cookies
+			const user = req.user
 
 			const orders = await OrdersService.getBybitSavedOrders(
 				language,
-				email,
+				user.id,
 				start_time,
 				end_time,
 				exchange

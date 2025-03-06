@@ -1,5 +1,13 @@
 require('dotenv').config()
 
+// TODO: req.user = {
+//   id: '67c85d2b757b182ae274947b',
+//   email: 'slavachirkov92@gmail.com',
+//   iat: 1741190251,
+//   exp: 1741192051
+// }
+// remove email from req.body in all routes
+
 const app = require('./config/express')
 const passport = require('./config/passport')
 const connectDB = require('./config/database')
