@@ -97,7 +97,7 @@ class BybitController {
 
 	async getBybitWallet(req, res, next) {
 		try {
-			const { exchange } = req.body
+			const { exchange, start_time, end_time } = req.body
 			const { language } = req.cookies
 			const user = req.user
 
@@ -119,7 +119,23 @@ class BybitController {
 
 			const wallet = await BybitService.getBybitWallet(language, current_keys)
 
-			return res.json(wallet)
+			const orders = await BybitService.getBybitOrdersPnl(
+				language,
+				current_keys,
+				start_time,
+				end_time
+			)
+
+			const total = await Helpers.calculateTotalProfit(orders)
+
+			return res.json({
+				total_balance: +wallet.total_balance,
+				unrealised_pnl: +wallet.unrealised_pnl,
+				total_profit: +total.profit,
+				total_loss: +total.loss,
+				wining_trades: +total.profitCount,
+				losing_trades: +total.lossCount,
+			})
 		} catch (e) {
 			next(e)
 		}

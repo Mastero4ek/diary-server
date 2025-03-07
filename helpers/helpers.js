@@ -68,15 +68,39 @@ class Helpers {
 
 		array.forEach(order => {
 			if (order.roe < 0) {
-				totalLoss += order.roe // Суммируем убытки
+				totalLoss += order.roe
 			} else {
-				totalProfit += order.roe // Суммируем прибыль
+				totalProfit += order.roe
 			}
 		})
 
 		return {
 			loss: parseFloat(Number(totalLoss)).toFixed(2),
 			profit: parseFloat(Number(totalProfit)).toFixed(2),
+		}
+	}
+
+	async calculateTotalProfit(array) {
+		let totalLoss = 0
+		let totalProfit = 0
+		let lossCount = 0
+		let profitCount = 0
+
+		array.forEach(order => {
+			if (order.roe < 0) {
+				totalLoss += order.pnl
+				lossCount++
+			} else {
+				totalProfit += order.pnl
+				profitCount++
+			}
+		})
+
+		return {
+			loss: parseFloat(Number(totalLoss)).toFixed(2),
+			profit: parseFloat(Number(totalProfit)).toFixed(2),
+			lossCount: parseFloat(Number(lossCount)),
+			profitCount: parseFloat(Number(profitCount)),
 		}
 	}
 }

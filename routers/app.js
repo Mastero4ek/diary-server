@@ -50,6 +50,6 @@ router.post(
 	userController.removeUser
 )
 
-router.post('/create-keys', authMiddleware, keysController.updateKeys)
+router.post('/update-keys', authMiddleware, keysController.updateKeys)
 
 module.exports = router

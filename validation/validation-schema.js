@@ -184,15 +184,6 @@ const ValidationSchema = {
 	},
 
 	orders: {
-		email: {
-			exists: {
-				errorMessage: 'Email is required',
-			},
-			isEmail: {
-				errorMessage: 'Invalid email format',
-			},
-			normalizeEmail: true,
-		},
 		exchange: {
 			exists: {
 				errorMessage: 'Exchange is required',
@@ -236,15 +227,6 @@ const ValidationSchema = {
 	},
 
 	wallet: {
-		email: {
-			exists: {
-				errorMessage: 'Email is required',
-			},
-			isEmail: {
-				errorMessage: 'Invalid email format',
-			},
-			normalizeEmail: true,
-		},
 		exchange: {
 			exists: {
 				errorMessage: 'Exchange is required',
