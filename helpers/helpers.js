@@ -1,4 +1,10 @@
 class Helpers {
+	capitalize = str => {
+		if (!str) return ''
+
+		return str.charAt(0).toUpperCase() + str.slice(1)
+	}
+
 	async paginate(
 		array,
 		page = 1,

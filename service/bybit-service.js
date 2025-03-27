@@ -216,6 +216,76 @@ class BybitService {
 
 		return wallet
 	}
+
+	async getBybitPositions(language, keys) {
+		// Генерировать ключ кэша на основе пользователя и временного диапазона.
+		const cacheKey = `bybit_positions:${keys.api}:${new Date().toISOString()}`
+
+		// Попробуйте получить данные из кеша, если Redis доступен.
+		if (redis) {
+			try {
+				const cachedData = await redis.get(cacheKey)
+
+				if (cachedData) {
+					return JSON.parse(cachedData)
+				}
+			} catch (error) {
+				console.error('Redis cache read error:', error)
+				// Продолжить без кеша, если возникла ошибка
+			}
+		}
+
+		const client = new RestClientV5({
+			testnet: false,
+			key: keys.api,
+			secret: keys.secret,
+		})
+
+		let allPositions = []
+
+		const response = await client.getPositionInfo({
+			category: 'linear', //'spot' | 'linear' | 'inverse' | 'option'
+			settleCoin: 'USDT',
+			// symbol: 'BTCUSDT',
+			//необязательные параметры
+			// baseCoin: string,
+			// limit: number,
+			// cursor: string,
+		})
+
+		if (response.result.list && response.result.list.length > 0) {
+			allPositions = [...allPositions, ...response.result.list]
+		}
+
+		// Добавляем логику для обработки пагинации
+		while (response.result.nextPageCursor !== '') {
+			const nextResponse = await client.getPositionInfo({
+				category: 'linear',
+				settleCoin: 'USDT',
+				cursor: response.result.nextPageCursor,
+			})
+
+			if (nextResponse.result.list && nextResponse.result.list.length > 0) {
+				allPositions = [...allPositions, ...nextResponse.result.list]
+			}
+
+			response.result.nextPageCursor = nextResponse.result.nextPageCursor
+		}
+
+		const orders = allPositions.map(item => new BybitOrderDto(item))
+
+		// Кэшируйте результаты, если Redis доступен
+		if (redis) {
+			try {
+				await redis.setex(cacheKey, 300, JSON.stringify(orders))
+			} catch (error) {
+				console.error('Redis cache write error:', error)
+				// Продолжить без кэширования, если возникла ошибка
+			}
+		}
+
+		return orders
+	}
 }
 
 module.exports = new BybitService()

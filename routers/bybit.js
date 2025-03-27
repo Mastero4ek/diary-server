@@ -20,4 +20,10 @@ router.post(
 
 router.post('/bybit-wallet', authMiddleware, bybitController.getBybitWallet)
 
+router.post(
+	'/bybit-positions',
+	authMiddleware,
+	bybitController.getBybitPositions
+)
+
 module.exports = router
