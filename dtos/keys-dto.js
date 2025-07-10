@@ -12,7 +12,8 @@ module.exports = class KeysDto {
 
 	maskKey(key) {
 		if (!key) return ''
-		// Show first 5 chars
-		return key.slice(0, 5) + '*'.repeat(key.length - 5)
+		const visible = key.slice(0, 5)
+		const maskedLength = Math.max(0, key.length - 5)
+		return visible + '*'.repeat(maskedLength)
 	}
 }

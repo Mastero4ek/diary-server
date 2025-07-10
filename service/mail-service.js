@@ -18,7 +18,7 @@ class MailService {
 		})
 	}
 
-	async sendActivationMail(name, to, language, link) {
+	async sendActivationMail(name, to, lng, link) {
 		const headerEnPath = path.join(
 			__dirname,
 			'../mails/assets/images/header-en.png'
@@ -56,16 +56,16 @@ class MailService {
 			from: process.env.SMTP_USER,
 			to,
 			subject:
-				language === 'ru'
+				lng === 'ru'
 					? 'Активация аккаунта на ' + process.env.CLIENT_URL
 					: 'Account activation on ' + process.env.CLIENT_URL,
 			text: '',
-			html: language === 'ru' ? mailRu : mailEn,
+			html: lng === 'ru' ? mailRu : mailEn,
 			attachments: [
 				{
 					filename: 'header.png',
-					path: language === 'ru' ? headerRuPath : headerEnPath,
-					cid: language === 'ru' ? 'header-ru' : 'header-en',
+					path: lng === 'ru' ? headerRuPath : headerEnPath,
+					cid: lng === 'ru' ? 'header-ru' : 'header-en',
 				},
 				{
 					filename: 'hamster.png',

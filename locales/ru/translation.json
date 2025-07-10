@@ -1,0 +1,95 @@
+{
+	"errors": {
+		"user_not_found": "Пользователь не найден!",
+		"invalid_email": "Неверный формат email!",
+		"email_exists": "Пользователь с таким email уже существует!",
+		"validation": "Ошибка при валидации!",
+		"email_mismatch": "Введённый Email-адрес не совпадает с Email-адресом аккаунта!",
+		"keys_not_found": "Ключи не найдены!",
+		"keys_not_configured": "Ключи {{exchange}} не настроены!",
+		"file_not_found": "Файл не найден!",
+		"order_exists": "Ордер уже сохранен!",
+		"tournament_not_found": "Соревнование на бирже {{exchange}} не найдено!",
+		"user_with_email_not_found": "Пользователь с таким email не найден!",
+		"no_members": "На данный момент нет участников!",
+		"activate_account_first": "Пожалуйста, активируйте свой аккаунт!",
+		"invalid_email_or_password": "Неверный email или пароль!",
+		"user_data_incomplete": "Данные пользователя неполные!",
+		"failed_generate_tokens": "Не удалось сгенерировать токены авторизации!",
+		"failed_sign_in": "Не удалось войти!",
+		"activation_link_required": "Требуется ссылка для активации!",
+		"invalid_activation_link": "Неверная ссылка активации!",
+		"account_already_activated": "Аккаунт уже активирован!",
+		"activation_link_expired": "Срок действия ссылки для активации истек. Новая ссылка отправлена на вашу почту.",
+		"failed_create_user": "Не удалось создать пользователя!",
+		"failed_activate_account": "Не удалось активировать аккаунт!",
+		"api_key_invalid": "API-ключ недействителен."
+	},
+	"success": {
+		"file_saved": "Файл успешно сохранен!",
+		"file_deleted": "Файл успешно удален!",
+		"keys_deleted": "Ключи успешно удалены!"
+	},
+	"validation": {
+		"name": {
+			"required": "Имя обязательно!",
+			"string": "Имя должно быть строкой!",
+			"length": "Имя должно быть от 2 до 50 символов!"
+		},
+		"email": {
+			"required": "Email обязателен!",
+			"invalid": "Неверный формат email!"
+		},
+		"password": {
+			"required": "Пароль обязателен!",
+			"string": "Пароль должен быть строкой!",
+			"length": "Пароль должен быть от 6 до 50 символов!"
+		},
+		"confirm_password": {
+			"required": "Подтверждение пароля обязательно!",
+			"mismatch": "Пароли не совпадают!"
+		},
+		"agreement": {
+			"required": "Необходимо согласие!",
+			"boolean": "Согласие должно быть булевым значением!",
+			"must_agree": "Вы должны согласиться с условиями!"
+		},
+		"current_email": {
+			"required": "Текущий email обязателен!",
+			"invalid": "Неверный формат email!"
+		},
+		"fill_email": {
+			"required": "Email для подтверждения обязателен!",
+			"invalid": "Неверный формат email!",
+			"mismatch": "Email-адреса не совпадают!"
+		},
+		"phone": {
+			"string": "Телефон должен быть строкой!",
+			"invalid": "Неверный формат телефона!"
+		},
+		"keys": {
+			"array": "Ключи должны быть массивом!",
+			"invalid": "Неверный формат ключей!"
+		},
+		"exchange": {
+			"required": "Биржа обязательна!",
+			"string": "Биржа должна быть строкой!",
+			"invalid": "Неверная биржа!"
+		},
+		"cursor": {
+			"string": "Cursor должен быть строкой!"
+		},
+		"limit": {
+			"invalid": "Лимит должен быть от 1 до 100!"
+		},
+		"page": {
+			"invalid": "Страница должна быть положительным числом!"
+		},
+		"start_time": {
+			"invalid": "Неверный формат времени начала!"
+		},
+		"end_time": {
+			"invalid": "Неверный формат времени окончания!"
+		}
+	}
+}

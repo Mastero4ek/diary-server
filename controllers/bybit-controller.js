@@ -2,35 +2,42 @@ const BybitService = require('../service/bybit-service')
 const KeysService = require('../service/keys-service')
 const Helpers = require('../helpers/helpers')
 const OrdersService = require('../service/orders-service')
-const ApiError = require('../exceptions/api-error')
+const { ApiError } = require('../exceptions/api-error')
 const moment = require('moment')
+const i18next = require('i18next')
 
 class BybitController {
 	async getBybitOrdersPnl(req, res, next) {
 		try {
+			console.log(
+				'getBybitOrdersPnl req.lng:',
+				req.lng,
+				'exchange:',
+				req.body.exchange
+			)
 			const { exchange, sort, search, page, limit, start_time, end_time } =
 				req.body
-			const { language } = req.cookies
 			const user = req.user
 
-			const keys = await KeysService.findKeys(user.id, language)
+			const keys = await KeysService.findKeys(user.id, req.lng)
 			if (!keys || keys.message) {
 				throw ApiError.BadRequest(
-					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
+					i18next.t('errors.keys_not_found', { lng: req.lng })
 				)
 			}
 
 			const current_keys = keys.keys.find(item => item.name === exchange)
 			if (!current_keys || !current_keys.api || !current_keys.secret) {
-				throw ApiError.BadRequest(
-					language === 'ru'
-						? `Ключи ${Helpers.capitalize(exchange)} не настроены!`
-						: `${exchange} keys are not configured!`
-				)
+				const msg = i18next.t('errors.keys_not_configured', {
+					lng: req.lng,
+					exchange: Helpers.capitalize(exchange),
+				})
+				console.log('i18n msg:', msg, 'lng:', req.lng)
+				throw ApiError.BadRequest(msg)
 			}
 
 			const orders = await BybitService.getBybitOrdersPnl(
-				language,
+				req.lng,
 				current_keys,
 				start_time,
 				end_time
@@ -47,7 +54,7 @@ class BybitController {
 			const total = await Helpers.calculateTotalPnl(orders)
 
 			const bookmarks = await OrdersService.getBybitSavedOrders(
-				language,
+				req.lng,
 				user.id,
 				start_time,
 				end_time,
@@ -70,25 +77,25 @@ class BybitController {
 		try {
 			const { exchange } = req.body
 			const user = req.user
-			const { language } = req.cookies
 
-			const keys = await KeysService.findKeys(user.id, language)
+			const keys = await KeysService.findKeys(user.id, req.lng)
 			if (!keys || keys.message) {
 				throw ApiError.BadRequest(
-					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
+					i18next.t('errors.keys_not_found', { lng: req.lng })
 				)
 			}
 
 			const current_keys = keys.keys.find(item => item.name === exchange)
 			if (!current_keys || !current_keys.api || !current_keys.secret) {
-				throw ApiError.BadRequest(
-					language === 'ru'
-						? `Ключи ${Helpers.capitalize(exchange)} не настроены!`
-						: `${exchange} keys are not configured!`
-				)
+				const msg = i18next.t('errors.keys_not_configured', {
+					lng: req.lng,
+					exchange: Helpers.capitalize(exchange),
+				})
+				console.log('i18n msg:', msg, 'lng:', req.lng)
+				throw ApiError.BadRequest(msg)
 			}
 
-			const tickers = await BybitService.getBybitTickers(language, current_keys)
+			const tickers = await BybitService.getBybitTickers(req.lng, current_keys)
 
 			return res.json(tickers)
 		} catch (e) {
@@ -98,30 +105,36 @@ class BybitController {
 
 	async getBybitWallet(req, res, next) {
 		try {
+			console.log(
+				'getBybitWallet req.lng:',
+				req.lng,
+				'exchange:',
+				req.body.exchange
+			)
 			const { exchange, start_time, end_time } = req.body
-			const { language } = req.cookies
 			const user = req.user
 
-			const keys = await KeysService.findKeys(user.id, language)
+			const keys = await KeysService.findKeys(user.id, req.lng)
 			if (!keys || keys.message) {
 				throw ApiError.BadRequest(
-					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
+					i18next.t('errors.keys_not_found', { lng: req.lng })
 				)
 			}
 
 			const current_keys = keys.keys.find(item => item.name === exchange)
 			if (!current_keys || !current_keys.api || !current_keys.secret) {
-				throw ApiError.BadRequest(
-					language === 'ru'
-						? `Ключи ${Helpers.capitalize(exchange)} не настроены!`
-						: `${exchange} keys are not configured!`
-				)
+				const msg = i18next.t('errors.keys_not_configured', {
+					lng: req.lng,
+					exchange: Helpers.capitalize(exchange),
+				})
+				console.log('i18n msg:', msg, 'lng:', req.lng)
+				throw ApiError.BadRequest(msg)
 			}
 
-			const wallet = await BybitService.getBybitWallet(language, current_keys)
+			const wallet = await BybitService.getBybitWallet(req.lng, current_keys)
 
 			const orders = await BybitService.getBybitOrdersPnl(
-				language,
+				req.lng,
 				current_keys,
 				start_time,
 				end_time
@@ -144,28 +157,34 @@ class BybitController {
 
 	async getBybitPositions(req, res, next) {
 		try {
+			console.log(
+				'getBybitPositions req.lng:',
+				req.lng,
+				'exchange:',
+				req.body.exchange
+			)
 			const { exchange, sort, search, page, limit } = req.body
-			const { language } = req.cookies
 			const user = req.user
 
-			const keys = await KeysService.findKeys(user.id, language)
+			const keys = await KeysService.findKeys(user.id, req.lng)
 			if (!keys || keys.message) {
 				throw ApiError.BadRequest(
-					language === 'ru' ? 'Ключи не найдены!' : 'Keys not found!'
+					i18next.t('errors.keys_not_found', { lng: req.lng })
 				)
 			}
 
 			const current_keys = keys.keys.find(item => item.name === exchange)
 			if (!current_keys || !current_keys.api || !current_keys.secret) {
-				throw ApiError.BadRequest(
-					language === 'ru'
-						? `Ключи ${Helpers.capitalize(exchange)} не настроены!`
-						: `${exchange} keys are not configured!`
-				)
+				const msg = i18next.t('errors.keys_not_configured', {
+					lng: req.lng,
+					exchange: Helpers.capitalize(exchange),
+				})
+				console.log('i18n msg:', msg, 'lng:', req.lng)
+				throw ApiError.BadRequest(msg)
 			}
 
 			const positions = await BybitService.getBybitPositions(
-				language,
+				req.lng,
 				current_keys
 			)
 
@@ -184,7 +203,7 @@ class BybitController {
 			const ordersByDay = await Promise.all(
 				period.map(async periodItem => {
 					const orders = await BybitService.getBybitOrdersPnl(
-						language,
+						req.lng,
 						current_keys,
 						periodItem.start, // Используем start для начала времени
 						periodItem.end // Используем end для конца времени

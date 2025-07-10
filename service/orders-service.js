@@ -1,19 +1,18 @@
 const OrderDto = require('../dtos/order-dto')
 const OrderModel = require('../models/order-model')
 const UserModel = require('../models/user-model')
-const ApiError = require('../exceptions/api-error')
+const { ApiError } = require('../exceptions/api-error')
+const i18next = require('i18next')
 
 class OrdersService {
-	async savedOrder(language, userId, order, exchange) {
+	async savedOrder(lng, userId, order, exchange) {
 		const existing_order = await OrderModel.findOne({
 			user: userId,
 			exchange,
 			id: order.id,
 		})
 		if (existing_order) {
-			throw ApiError.BadRequest(
-				language === 'ru' ? `Ордер уже сохранен!` : `Order already saved!`
-			)
+			throw ApiError.BadRequest(i18next.t('errors.order_exists', { lng }))
 		}
 
 		const new_order = await OrderModel.create({

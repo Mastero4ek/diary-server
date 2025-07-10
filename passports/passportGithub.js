@@ -19,7 +19,7 @@ passport.use(
 
 				if (!user) {
 					// Get primary email from GitHub profile
-					const primaryEmail = profile.emails[0].value
+					const primaryEmail = profile.emails[0].value.toLowerCase()
 
 					// Check if user exists with this email
 					user = await UserModel.findOne({ email: primaryEmail })
@@ -38,6 +38,7 @@ passport.use(
 							name: profile.displayName || profile.username,
 							activation_link: uuid.v4(),
 							is_activated: true,
+							change_password: false,
 							source: 'github',
 							github: {
 								id: profile.id,
@@ -48,14 +49,11 @@ passport.use(
 						// Create empty keys document
 						await KeysModel.create({
 							user: user._id,
-							keys: [],
 						})
 
 						// Create empty level document
 						await LevelModel.create({
 							user: user._id,
-							level: 0,
-							experience: 0,
 						})
 					}
 				}

@@ -1,4 +1,6 @@
-module.exports = class ApiError extends Error {
+const i18next = require('i18next')
+
+class ApiError extends Error {
 	status
 	errors
 
@@ -21,3 +23,10 @@ module.exports = class ApiError extends Error {
 		return new ApiError(500, message, errors)
 	}
 }
+
+// Хелпер для локализации ошибок
+function localizedError(key, language = 'en', options = {}) {
+	return i18next.t(key, { lng: language, ...options })
+}
+
+module.exports = { ApiError, localizedError }

@@ -1,22 +1,22 @@
 const userService = require('../service/user-service')
 const { validationResult } = require('express-validator')
-const ApiError = require('../exceptions/api-error')
+const { ApiError } = require('../exceptions/api-error')
 const UserModel = require('../models/user-model')
 const fileService = require('../service/file-service')
 const tokenService = require('../service/token-service')
 const keysService = require('../service/keys-service')
+const i18next = require('i18next')
 
 class UserController {
 	async signUp(req, res, next) {
 		try {
 			const errors = validationResult(req)
-			const { name, email, password } = req.body
-			const { language } = req.cookies
+			const { name, email, password, source } = req.body
 
 			if (!errors.isEmpty()) {
 				return next(
 					ApiError.BadRequest(
-						language === 'ru' ? 'Ошибка при валидации!' : 'Validation error!',
+						i18next.t('errors.validation', { lng: req.lng }),
 						errors.array()
 					)
 				)
@@ -26,7 +26,8 @@ class UserController {
 				name,
 				email,
 				password,
-				language
+				req.lng,
+				source
 			)
 
 			res.cookie('refresh_token', user_data.refresh_token, {
@@ -44,18 +45,17 @@ class UserController {
 		try {
 			const errors = validationResult(req)
 			const { email, password } = req.body
-			const { language } = req.cookies
 
 			if (!errors.isEmpty()) {
 				return next(
 					ApiError.BadRequest(
-						language === 'ru' ? 'Ошибка при валидации!' : 'Validation error!',
+						i18next.t('errors.validation', { lng: req.lng }),
 						errors.array()
 					)
 				)
 			}
 
-			const user_data = await userService.signIn(email, password, language)
+			const user_data = await userService.signIn(email, password, req.lng)
 
 			res.cookie('refresh_token', user_data.refresh_token, {
 				maxAge: 30 * 24 * 60 * 60 * 1000,
@@ -178,7 +178,6 @@ class UserController {
 		try {
 			const { name, last_name, email, password, phone } = req.body
 			const cover = req.file
-			const { language } = req.cookies
 			const user = req.user // Get the authenticated user from the request
 
 			if (!user) {
@@ -193,10 +192,10 @@ class UserController {
 					const last_slash_index = existingUser.cover.lastIndexOf('/')
 					const file_name = existingUser.cover.substring(last_slash_index + 1)
 
-					await fileService.removeCover(file_name, existingUser.email, language)
+					await fileService.removeCover(file_name, existingUser.email, req.lng)
 				}
 
-				await fileService.uploadCover(cover, existingUser.email, language)
+				await fileService.uploadCover(cover, existingUser.email, req.lng)
 			}
 
 			// Update user data
@@ -218,15 +217,12 @@ class UserController {
 		try {
 			const errors = validationResult(req)
 			const { current_email, fill_email } = req.body
-			const { refresh_token, language } = req.cookies
 			const current_user = await UserModel.findOne({ email: current_email })
 
 			if (current_user && current_user.email !== fill_email) {
 				return next(
 					ApiError.BadRequest(
-						language === 'ru'
-							? 'Введённый Email-адрес не совпадает с Email-адресом аккаунта!'
-							: 'The email address you entered does not match your account email address!',
+						i18next.t('errors.email_mismatch', { lng: req.lng }),
 						errors.array()
 					)
 				)
@@ -235,7 +231,7 @@ class UserController {
 			if (!errors.isEmpty()) {
 				return next(
 					ApiError.BadRequest(
-						language === 'ru' ? 'Ошибка при валидации!' : 'Validation error!',
+						i18next.t('errors.validation', { lng: req.lng }),
 						errors.array()
 					)
 				)
@@ -245,11 +241,11 @@ class UserController {
 				const last_slash_index = current_user.cover.lastIndexOf('/')
 				const file_name = current_user.cover.substring(last_slash_index + 1)
 
-				await fileService.removeCover(file_name, current_email, language)
+				await fileService.removeCover(file_name, current_email, req.lng)
 			}
 
 			await tokenService.removeToken(refresh_token)
-			await keysService.removeKeys(current_email, language)
+			await keysService.removeKeys(current_email, req.lng)
 			await userService.removeUser(current_email, refresh_token)
 
 			req.session.destroy(err => {

@@ -9,26 +9,27 @@ const tokenService = require('./token-service')
 const mailService = require('./mail-service')
 const UserDto = require('../dtos/user-dto')
 const KeysDto = require('../dtos/keys-dto')
-const ApiError = require('../exceptions/api-error')
+const { ApiError, localizedError } = require('../exceptions/api-error')
 const moment = require('moment')
 const OrderModel = require('../models/order-model')
+const i18next = require('i18next')
 
 class UserService {
-	async signUp(name, email, password, language) {
+	async signUp(name, email, password, lng, source = 'local') {
 		try {
-			console.log('Starting signup process for:', email)
-
 			// Check if user already exists
-			const existingUser = await UserModel.findOne({ email })
+			const normalizedEmail = email.toLowerCase()
+			const existingUser = await UserModel.findOne({ email: normalizedEmail })
 			if (existingUser) {
-				throw ApiError.BadRequest('User with this email already exists')
+				throw ApiError.BadRequest(i18next.t('errors.email_exists', { lng }))
 			}
-			console.log('User does not exist, proceeding with creation')
 
-			// Hash password
-			const salt = await bcrypt.genSalt(10)
-			const hashedPassword = await bcrypt.hash(password, salt)
-			console.log('Password hashed successfully')
+			let hashedPassword = undefined
+			if (source === 'local') {
+				// Hash password
+				const salt = await bcrypt.genSalt(10)
+				hashedPassword = await bcrypt.hash(password, salt)
+			}
 
 			// Create activation link
 			const activation_link = uuid.v4()
@@ -36,34 +37,28 @@ class UserService {
 			// Create user
 			const user = await UserModel.create({
 				name,
-				email,
-				password: hashedPassword,
+				email: normalizedEmail,
+				...(source === 'local' ? { password: hashedPassword } : {}),
 				activation_link,
-				source: 'local',
+				source,
 				updated_at: new Date(),
 				created_at: new Date(),
 			})
-			console.log('User created successfully:', user._id)
 
 			// Create associated data
 			const keys = await KeysModel.create({ user: user._id })
-			console.log('Keys created successfully')
-
 			const level = await LevelModel.create({ user: user._id })
-			console.log('Level created successfully')
 
 			// Send activation email
 			await mailService.sendActivationMail(
 				name,
 				email,
-				language,
+				lng,
 				`${process.env.API_URL}/api/activate/${activation_link}`
 			)
-			console.log('Activation email sent successfully')
 
 			// Generate tokens
 			const user_dto = new UserDto(user)
-			console.log('User DTO created:', { id: user_dto.id })
 
 			const tokens = await tokenService.generateTokens({
 				id: user._id.toString(),
@@ -71,13 +66,13 @@ class UserService {
 			})
 
 			if (!tokens || !tokens.refresh_token) {
-				throw ApiError.InternalError('Failed to generate authentication tokens')
+				throw ApiError.InternalError(
+					i18next.t('errors.failed_generate_tokens', { lng })
+				)
 			}
-			console.log('Tokens generated successfully')
 
 			// Save refresh token
 			await tokenService.saveToken(user_dto.id, tokens.refresh_token)
-			console.log('Token saved successfully')
 
 			return {
 				...tokens,
@@ -101,34 +96,42 @@ class UserService {
 							KeysModel.deleteOne({ user: user._id }),
 							LevelModel.deleteOne({ user: user._id }),
 						])
-						console.log('Cleaned up partial user creation')
 					}
 				} catch (cleanupError) {
 					console.error('Cleanup error:', cleanupError)
 				}
 			}
 
-			throw ApiError.InternalError('Failed to create user')
+			throw ApiError.InternalError(
+				i18next.t('errors.failed_create_user', { lng })
+			)
 		}
 	}
 
-	async signIn(email, password, language) {
+	async signIn(email, password, lng) {
 		try {
 			// Find user
-			const user = await UserModel.findOne({ email })
+			const normalizedEmail = email.toLowerCase()
+			const user = await UserModel.findOne({ email: normalizedEmail })
 			if (!user) {
-				throw ApiError.UnauthorizedError('Invalid email or password')
+				throw ApiError.UnauthorizedError(
+					i18next.t('errors.user_not_found', { lng })
+				)
 			}
 
 			// Check if user is activated
 			if (!user.is_activated) {
-				throw ApiError.UnauthorizedError('Please activate your account first')
+				throw ApiError.UnauthorizedError(
+					i18next.t('errors.activate_account_first', { lng })
+				)
 			}
 
 			// Verify password
 			const isPasswordValid = await bcrypt.compare(password, user.password)
 			if (!isPasswordValid) {
-				throw ApiError.UnauthorizedError('Invalid email or password')
+				throw ApiError.UnauthorizedError(
+					i18next.t('errors.invalid_email_or_password', { lng })
+				)
 			}
 
 			// Update last login
@@ -140,7 +143,9 @@ class UserService {
 			const level = await LevelModel.findOne({ user: user._id })
 
 			if (!keys || !level) {
-				throw ApiError.InternalError('User data incomplete')
+				throw ApiError.InternalError(
+					i18next.t('errors.user_data_incomplete', { lng })
+				)
 			}
 
 			// Generate tokens
@@ -151,7 +156,9 @@ class UserService {
 			})
 
 			if (!tokens || !tokens.refresh_token) {
-				throw ApiError.InternalError('Failed to generate authentication tokens')
+				throw ApiError.InternalError(
+					i18next.t('errors.failed_generate_tokens', { lng })
+				)
 			}
 
 			await tokenService.saveToken(user._id.toString(), tokens.refresh_token)
@@ -164,13 +171,14 @@ class UserService {
 			if (error instanceof ApiError) {
 				throw error
 			}
-			throw ApiError.InternalError('Failed to sign in')
+			throw ApiError.InternalError(i18next.t('errors.failed_sign_in', { lng }))
 		}
 	}
 
 	async checkSourceAuth(email) {
 		try {
-			const user = await UserModel.findOne({ email })
+			const normalizedEmail = email.toLowerCase()
+			const user = await UserModel.findOne({ email: normalizedEmail })
 			if (!user) {
 				throw ApiError.UnauthorizedError('User not found')
 			}
@@ -290,16 +298,22 @@ class UserService {
 	async activate(activation_link) {
 		try {
 			if (!activation_link) {
-				throw ApiError.BadRequest('Activation link is required')
+				throw ApiError.BadRequest(
+					i18next.t('errors.activation_link_required', { lng: 'en' })
+				)
 			}
 
 			const user = await UserModel.findOne({ activation_link })
 			if (!user) {
-				throw ApiError.BadRequest('Invalid activation link')
+				throw ApiError.BadRequest(
+					i18next.t('errors.invalid_activation_link', { lng: 'en' })
+				)
 			}
 
 			if (user.is_activated) {
-				throw ApiError.BadRequest('Account is already activated')
+				throw ApiError.BadRequest(
+					i18next.t('errors.account_already_activated', { lng: 'en' })
+				)
 			}
 
 			// Check if activation link is expired (24 hours)
@@ -321,7 +335,7 @@ class UserService {
 				)
 
 				throw ApiError.BadRequest(
-					'Activation link has expired. A new activation link has been sent to your email.'
+					i18next.t('errors.activation_link_expired', { lng: 'en' })
 				)
 			}
 
@@ -365,7 +379,9 @@ class UserService {
 				throw error
 			}
 			console.error('Activation error:', error)
-			throw ApiError.InternalError('Failed to activate account')
+			throw ApiError.InternalError(
+				i18next.t('errors.failed_activate_account', { lng })
+			)
 		}
 	}
 

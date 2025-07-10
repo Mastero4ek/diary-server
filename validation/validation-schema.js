@@ -1,58 +1,79 @@
+const i18next = require('i18next')
+
 const ValidationSchema = {
 	registration: {
 		name: {
 			exists: {
-				errorMessage: 'Name is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.name.required', { lng: req.lng }),
 			},
 			isString: {
-				errorMessage: 'Name must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.name.string', { lng: req.lng }),
 			},
 			trim: true,
 			isLength: {
 				options: { min: 2, max: 50 },
-				errorMessage: 'Name must be between 2 and 50 characters',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.name.length', { lng: req.lng }),
 			},
 		},
 		email: {
 			exists: {
-				errorMessage: 'Email is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.email.required', { lng: req.lng }),
 			},
 			isEmail: {
-				errorMessage: 'Invalid email format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.email.invalid', { lng: req.lng }),
 			},
 			normalizeEmail: true,
 		},
 		password: {
 			exists: {
-				errorMessage: 'Password is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.password.required', { lng: req.lng }),
 			},
 			isString: {
-				errorMessage: 'Password must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.password.string', { lng: req.lng }),
 			},
 			isLength: {
 				options: { min: 6, max: 50 },
-				errorMessage: 'Password must be between 6 and 50 characters',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.password.length', { lng: req.lng }),
+			},
+			optional: {
+				options: ({ req }) => req.body.source && req.body.source !== 'local',
 			},
 		},
 		confirm_password: {
 			exists: {
-				errorMessage: 'Password confirmation is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.confirm_password.required', { lng: req.lng }),
 			},
 			custom: {
 				options: (value, { req }) => value === req.body.password,
-				errorMessage: 'Passwords do not match',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.confirm_password.mismatch', { lng: req.lng }),
+			},
+			optional: {
+				options: ({ req }) => req.body.source && req.body.source !== 'local',
 			},
 		},
 		agreement: {
 			exists: {
-				errorMessage: 'Agreement is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.agreement.required', { lng: req.lng }),
 			},
 			isBoolean: {
-				errorMessage: 'Agreement must be a boolean',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.agreement.boolean', { lng: req.lng }),
 			},
 			custom: {
 				options: value => value === true,
-				errorMessage: 'You must agree to the terms',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.agreement.must_agree', { lng: req.lng }),
 			},
 		},
 	},
@@ -60,19 +81,23 @@ const ValidationSchema = {
 	login: {
 		email: {
 			exists: {
-				errorMessage: 'Email is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.email.required', { lng: req.lng }),
 			},
 			isEmail: {
-				errorMessage: 'Invalid email format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.email.invalid', { lng: req.lng }),
 			},
 			normalizeEmail: true,
 		},
 		password: {
 			exists: {
-				errorMessage: 'Password is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.password.required', { lng: req.lng }),
 			},
 			isString: {
-				errorMessage: 'Password must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.password.string', { lng: req.lng }),
 			},
 		},
 	},
@@ -80,24 +105,29 @@ const ValidationSchema = {
 	remove: {
 		current_email: {
 			exists: {
-				errorMessage: 'Current email is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.current_email.required', { lng: req.lng }),
 			},
 			isEmail: {
-				errorMessage: 'Invalid email format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.current_email.invalid', { lng: req.lng }),
 			},
 			normalizeEmail: true,
 		},
 		fill_email: {
 			exists: {
-				errorMessage: 'Confirmation email is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.fill_email.required', { lng: req.lng }),
 			},
 			isEmail: {
-				errorMessage: 'Invalid email format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.fill_email.invalid', { lng: req.lng }),
 			},
 			normalizeEmail: true,
 			custom: {
 				options: (value, { req }) => value === req.body.current_email,
-				errorMessage: 'Email addresses do not match',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.fill_email.mismatch', { lng: req.lng }),
 			},
 		},
 	},
@@ -106,29 +136,34 @@ const ValidationSchema = {
 		name: {
 			optional: true,
 			isString: {
-				errorMessage: 'Name must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.name.string', { lng: req.lng }),
 			},
 			trim: true,
 			isLength: {
 				options: { min: 2, max: 50 },
-				errorMessage: 'Name must be between 2 and 50 characters',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.name.length', { lng: req.lng }),
 			},
 		},
 		email: {
 			optional: true,
 			isEmail: {
-				errorMessage: 'Invalid email format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.email.invalid', { lng: req.lng }),
 			},
 			normalizeEmail: true,
 		},
 		phone: {
 			optional: true,
 			isString: {
-				errorMessage: 'Phone must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.phone.string', { lng: req.lng }),
 			},
 			matches: {
 				options: /^\+?[\d\s-()]+$/,
-				errorMessage: 'Invalid phone number format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.phone.invalid', { lng: req.lng }),
 			},
 		},
 	},
@@ -136,7 +171,8 @@ const ValidationSchema = {
 	createKeys: {
 		keys: {
 			isArray: {
-				errorMessage: 'Keys must be an array',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.keys.array', { lng: req.lng }),
 			},
 			custom: {
 				options: value => {
@@ -149,7 +185,8 @@ const ValidationSchema = {
 							typeof key.secret === 'string'
 					)
 				},
-				errorMessage: 'Invalid keys format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.keys.invalid', { lng: req.lng }),
 			},
 		},
 	},
@@ -157,27 +194,32 @@ const ValidationSchema = {
 	tournament: {
 		exchange: {
 			exists: {
-				errorMessage: 'Exchange is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.required', { lng: req.lng }),
 			},
 			isString: {
-				errorMessage: 'Exchange must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.string', { lng: req.lng }),
 			},
 			isIn: {
 				options: [['bybit', 'mexc', 'okx']],
-				errorMessage: 'Invalid exchange',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.invalid', { lng: req.lng }),
 			},
 		},
 		cursor: {
 			optional: true,
 			isString: {
-				errorMessage: 'Cursor must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.cursor.string', { lng: req.lng }),
 			},
 		},
 		limit: {
 			optional: true,
 			isInt: {
 				options: { min: 1, max: 100 },
-				errorMessage: 'Limit must be between 1 and 100',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.limit.invalid', { lng: req.lng }),
 			},
 			toInt: true,
 		},
@@ -186,33 +228,39 @@ const ValidationSchema = {
 	orders: {
 		exchange: {
 			exists: {
-				errorMessage: 'Exchange is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.required', { lng: req.lng }),
 			},
 			isString: {
-				errorMessage: 'Exchange must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.string', { lng: req.lng }),
 			},
 			isIn: {
 				options: [['bybit', 'mexc', 'okx']],
-				errorMessage: 'Invalid exchange',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.invalid', { lng: req.lng }),
 			},
 		},
 		start_time: {
 			optional: true,
 			isISO8601: {
-				errorMessage: 'Invalid start time format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.start_time.invalid', { lng: req.lng }),
 			},
 		},
 		end_time: {
 			optional: true,
 			isISO8601: {
-				errorMessage: 'Invalid end time format',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.end_time.invalid', { lng: req.lng }),
 			},
 		},
 		page: {
 			optional: true,
 			isInt: {
 				options: { min: 1 },
-				errorMessage: 'Page must be a positive integer',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.page.invalid', { lng: req.lng }),
 			},
 			toInt: true,
 		},
@@ -220,7 +268,8 @@ const ValidationSchema = {
 			optional: true,
 			isInt: {
 				options: { min: 1, max: 100 },
-				errorMessage: 'Limit must be between 1 and 100',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.limit.invalid', { lng: req.lng }),
 			},
 			toInt: true,
 		},
@@ -229,14 +278,17 @@ const ValidationSchema = {
 	wallet: {
 		exchange: {
 			exists: {
-				errorMessage: 'Exchange is required',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.required', { lng: req.lng }),
 			},
 			isString: {
-				errorMessage: 'Exchange must be a string',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.string', { lng: req.lng }),
 			},
 			isIn: {
 				options: [['bybit', 'mexc', 'okx']],
-				errorMessage: 'Invalid exchange',
+				errorMessage: (value, { req }) =>
+					i18next.t('validation.exchange.invalid', { lng: req.lng }),
 			},
 		},
 	},

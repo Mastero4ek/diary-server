@@ -2,9 +2,10 @@ const FileModel = require('../models/file-model')
 const UserModel = require('../models/user-model')
 const fs = require('fs')
 const path = require('path')
+const i18next = require('i18next')
 
 class FileService {
-	async uploadCover(cover, email, language) {
+	async uploadCover(cover, email, lng) {
 		const user = await UserModel.findOneAndUpdate(
 			{ email },
 			{
@@ -26,21 +27,18 @@ class FileService {
 		await user.save()
 
 		return {
-			message:
-				language === 'ru'
-					? 'Файл успешно сохранен!'
-					: 'File saved successfully!',
+			message: i18next.t('success.file_saved', { lng }),
 		}
 	}
 
-	async removeCover(file_name, userId, language) {
+	async removeCover(file_name, userId, lng) {
 		const file = await FileModel.findOneAndDelete({
 			user: userId,
 			name: file_name,
 		})
 		if (!file)
 			return {
-				message: language === 'ru' ? 'Файл не найден!' : 'File not found!',
+				message: i18next.t('errors.file_not_found', { lng }),
 			}
 
 		fs.unlinkSync('uploads/' + file.name)
@@ -57,10 +55,7 @@ class FileService {
 		)
 
 		return {
-			message:
-				language === 'ru'
-					? 'Файл успешно удален!'
-					: 'The file was successfully deleted!',
+			message: i18next.t('success.file_deleted', { lng }),
 		}
 	}
 }

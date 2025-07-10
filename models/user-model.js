@@ -4,13 +4,27 @@ const UserSchema = new Schema({
 	name: { type: String, required: true },
 	last_name: { type: String, default: '' },
 	email: { type: String, unique: true, required: true },
-	password: { type: String, required: true },
+	password: { type: String, required: false },
 	activation_link: { type: String },
 	source: { type: String, default: 'self' },
 	is_activated: { type: Boolean, default: false },
 	change_password: { type: Boolean, default: true },
 	phone: { type: Number, default: null },
 	cover: { type: String, default: null },
+	google: {
+		type: {
+			id: { type: String },
+			email: { type: String },
+		},
+		default: undefined,
+	},
+	github: {
+		type: {
+			id: { type: String },
+			email: { type: String },
+		},
+		default: undefined,
+	},
 	created_at: { type: Date, default: Date.now, required: true },
 	updated_at: { type: Date, default: Date.now },
 })

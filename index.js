@@ -23,10 +23,29 @@ const routerOrders = require('./routers/orders')
 const passportSetupGoogle = require('./passports/passportGoogle')
 const passportSetupGithub = require('./passports/passportGithub')
 const errorMiddleware = require('./middlewares/error-middleware')
+const i18next = require('i18next')
+const Backend = require('i18next-fs-backend')
+const path = require('path')
+const langMiddleware = require('./middlewares/lang-middleware')
+
+// Инициализация i18next
+// Файлы переводов: server/locales/{ru,en}/translation.json
+
+i18next.use(Backend).init({
+	preload: ['en', 'ru'],
+	fallbackLng: 'en',
+	backend: {
+		loadPath: path.join(__dirname, 'locales/{{lng}}/translation.json'),
+	},
+	interpolation: {
+		escapeValue: false,
+	},
+})
 
 const PORT = process.env.PORT || 5001
 
 // Apply routes
+app.use(langMiddleware)
 app.use('/api', routerApi)
 app.use('/auth', routerGoogle)
 app.use('/auth', routerGithub)

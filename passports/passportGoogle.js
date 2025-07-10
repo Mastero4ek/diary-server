@@ -19,40 +19,40 @@ passport.use(
 
 				if (!user) {
 					// Check if user exists with this email
-					user = await UserModel.findOne({ email: profile.emails[0].value })
+					const googleEmail = profile.emails[0].value.toLowerCase()
+					user = await UserModel.findOne({ email: googleEmail })
 
 					if (user) {
 						// Link Google account to existing user
 						user.google = {
 							id: profile.id,
-							email: profile.emails[0].value,
+							email: googleEmail,
 						}
 						await user.save()
 					} else {
 						// Create new user
+						const googleEmail = profile.emails[0].value.toLowerCase()
 						user = await UserModel.create({
-							email: profile.emails[0].value,
+							email: googleEmail,
 							name: profile.displayName,
 							activation_link: uuid.v4(),
 							is_activated: true,
+							change_password: false,
 							source: 'google',
 							google: {
 								id: profile.id,
-								email: profile.emails[0].value,
+								email: googleEmail,
 							},
 						})
 
 						// Create empty keys document
 						await KeysModel.create({
 							user: user._id,
-							keys: [],
 						})
 
 						// Create empty level document
 						await LevelModel.create({
 							user: user._id,
-							level: 0,
-							experience: 0,
 						})
 					}
 				}

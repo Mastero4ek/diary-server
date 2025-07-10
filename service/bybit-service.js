@@ -3,6 +3,8 @@ const moment = require('moment')
 const BybitOrderDto = require('../dtos/bybit-order-dto')
 const redis = require('../config/redis')
 const KeysService = require('./keys-service')
+const { ApiError } = require('../exceptions/api-error')
+const i18next = require('i18next')
 
 class BybitService {
 	async getBybitOrdersPnl(language, keys, start_time, end_time) {

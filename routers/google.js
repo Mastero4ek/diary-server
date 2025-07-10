@@ -24,7 +24,7 @@ router.get(
 			const userDto = new UserDto(user)
 			const keysDto = new KeysDto(keys)
 
-			const tokens = tokenService.generateTokens({ ...userDto })
+			const tokens = await tokenService.generateTokens({ ...userDto })
 			await tokenService.saveToken(userDto.id, tokens.refresh_token)
 
 			// Set tokens as HTTP-only cookies

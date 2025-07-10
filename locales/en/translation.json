@@ -1,0 +1,95 @@
+{
+	"errors": {
+		"user_not_found": "User not found!",
+		"invalid_email": "Invalid email format!",
+		"email_exists": "User with this email already exists!",
+		"validation": "Validation error!",
+		"email_mismatch": "The email address you entered does not match your account email address!",
+		"keys_not_found": "Keys not found!",
+		"keys_not_configured": "{{exchange}} keys are not configured!",
+		"file_not_found": "File not found!",
+		"order_exists": "Order already saved!",
+		"tournament_not_found": "Tournament on the {{exchange}} exchange not found!",
+		"user_with_email_not_found": "User with this email was not found!",
+		"no_members": "There are currently no members!",
+		"activate_account_first": "Please activate your account first!",
+		"invalid_email_or_password": "Invalid email or password!",
+		"user_data_incomplete": "User data incomplete!",
+		"failed_generate_tokens": "Failed to generate authentication tokens!",
+		"failed_sign_in": "Failed to sign in!",
+		"activation_link_required": "Activation link is required!",
+		"invalid_activation_link": "Invalid activation link!",
+		"account_already_activated": "Account is already activated!",
+		"activation_link_expired": "Activation link has expired. A new activation link has been sent to your email.",
+		"failed_create_user": "Failed to create user!",
+		"failed_activate_account": "Failed to activate account!",
+		"api_key_invalid": "API key is invalid."
+	},
+	"success": {
+		"file_saved": "File saved successfully!",
+		"file_deleted": "The file was successfully deleted!",
+		"keys_deleted": "The keys were successfully deleted!"
+	},
+	"validation": {
+		"name": {
+			"required": "Name is required!",
+			"string": "Name must be a string!",
+			"length": "Name must be between 2 and 50 characters!"
+		},
+		"email": {
+			"required": "Email is required!",
+			"invalid": "Invalid email format!"
+		},
+		"password": {
+			"required": "Password is required!",
+			"string": "Password must be a string!",
+			"length": "Password must be between 6 and 50 characters!"
+		},
+		"confirm_password": {
+			"required": "Password confirmation is required!",
+			"mismatch": "Passwords do not match!"
+		},
+		"agreement": {
+			"required": "Agreement is required!",
+			"boolean": "Agreement must be a boolean!",
+			"must_agree": "You must agree to the terms!"
+		},
+		"current_email": {
+			"required": "Current email is required!",
+			"invalid": "Invalid email format!"
+		},
+		"fill_email": {
+			"required": "Confirmation email is required!",
+			"invalid": "Invalid email format!",
+			"mismatch": "Email addresses do not match!"
+		},
+		"phone": {
+			"string": "Phone must be a string!",
+			"invalid": "Invalid phone number format!"
+		},
+		"keys": {
+			"array": "Keys must be an array!",
+			"invalid": "Invalid keys format!"
+		},
+		"exchange": {
+			"required": "Exchange is required!",
+			"string": "Exchange must be a string!",
+			"invalid": "Invalid exchange!"
+		},
+		"cursor": {
+			"string": "Cursor must be a string!"
+		},
+		"limit": {
+			"invalid": "Limit must be between 1 and 100!"
+		},
+		"page": {
+			"invalid": "Page must be a positive integer!"
+		},
+		"start_time": {
+			"invalid": "Invalid start time format!"
+		},
+		"end_time": {
+			"invalid": "Invalid end time format!"
+		}
+	}
+}

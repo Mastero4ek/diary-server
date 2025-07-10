@@ -9,9 +9,11 @@ module.exports = class UserDto {
 	source
 	phone
 	change_password
+	google
+	github
 
 	constructor(model) {
-		this.id = model._id
+		this.id = model._id || model.id
 		this.name = model.name
 		this.last_name = model.last_name
 		this.email = model.email
@@ -21,5 +23,7 @@ module.exports = class UserDto {
 		this.source = model.source
 		this.phone = model.phone
 		this.change_password = model.change_password
+		this.google = model.google
+		this.github = model.github
 	}
 }

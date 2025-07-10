@@ -1,31 +1,24 @@
 const KeysModel = require('../models/keys-model')
 const UserModel = require('../models/user-model')
 const KeysDto = require('../dtos/keys-dto')
-const ApiError = require('../exceptions/api-error')
+const { ApiError } = require('../exceptions/api-error')
+const i18next = require('i18next')
 
 class KeysService {
-	async findKeys(userId, language) {
+	async findKeys(userId, lng) {
 		const keys = await KeysModel.findOne({ user: userId })
 
 		if (!keys) {
-			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Ключи пользователя с email - ${email} не найдены!`
-					: `User keys with email - ${email} not found!`
-			)
+			throw ApiError.BadRequest(i18next.t('errors.keys_not_found', { lng }))
 		}
 
 		return keys
 	}
 
-	async updateKeys(userId, exchange, api, secret, language) {
+	async updateKeys(userId, exchange, api, secret, lng) {
 		const keys = await KeysModel.findOne({ user: userId })
 		if (!keys) {
-			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Ключи пользователя с email - ${email} не найдены!`
-					: `User keys with email - ${email} not found!`
-			)
+			throw ApiError.BadRequest(i18next.t('errors.keys_not_found', { lng }))
 		}
 
 		keys.keys = keys.keys.map(key => {
@@ -47,23 +40,16 @@ class KeysService {
 		return keys_dto
 	}
 
-	async removeKeys(email, language) {
+	async removeKeys(email, lng) {
 		const user = await UserModel.findOne({ email })
 		const keys = await KeysModel.findOneAndDelete({ user: user._id })
 
 		if (!keys) {
-			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Ключи пользователя с email - ${email} не найдены!`
-					: `User keys with email - ${email} not found!`
-			)
+			throw ApiError.BadRequest(i18next.t('errors.keys_not_found', { lng }))
 		}
 
 		return {
-			message:
-				language === 'ru'
-					? 'Ключи успешно удалены!'
-					: 'The keys was successfully deleted!',
+			message: i18next.t('success.keys_deleted', { lng }),
 		}
 	}
 

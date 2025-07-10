@@ -3,7 +3,8 @@ const TournamentUserModel = require('../models/tournament_user-model')
 const UserModel = require('../models/user-model')
 const LevelModel = require('../models/level-model')
 const moment = require('moment')
-const ApiError = require('../exceptions/api-error')
+const { ApiError } = require('../exceptions/api-error')
+const i18next = require('i18next')
 
 class TournamentService {
 	async createTournament(exchange) {
@@ -39,23 +40,19 @@ class TournamentService {
 		)
 	}
 
-	async addTournamentUser(exchange, userId, language, page = 1, limit = 5) {
+	async addTournamentUser(exchange, userId, lng, page = 1, limit = 5) {
 		const user = await UserModel.findOne({ _id: userId })
 		const tournament = await TournamentModel.findOne({ exchange })
 
 		if (!tournament) {
 			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Соревнование на бирже ${exchange} не найдено!`
-					: `Tournament on the ${exchange} exchange not found!`
+				i18next.t('errors.tournament_not_found', { lng, exchange })
 			)
 		}
 
 		if (!user) {
 			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Пользователь с email адресом - ${email} не найден!`
-					: `User with email - ${email} was not found!`
+				i18next.t('errors.user_with_email_not_found', { lng })
 			)
 		}
 
@@ -83,10 +80,7 @@ class TournamentService {
 				tournament,
 				users: [],
 				total: 0,
-				message:
-					language === 'ru'
-						? `На данный момент нет участников!`
-						: `There are currently no members!`,
+				message: i18next.t('errors.no_members', { lng }),
 			}
 		}
 
@@ -95,14 +89,12 @@ class TournamentService {
 		return { tournament, users, total }
 	}
 
-	async getTournament(exchange, language, cursor, limit = 5) {
+	async getTournament(exchange, lng, cursor, limit = 5) {
 		const tournament = await TournamentModel.findOne({ exchange })
 
 		if (!tournament) {
 			throw ApiError.BadRequest(
-				language === 'ru'
-					? `Соревнование на бирже ${exchange} не найдено!`
-					: `Tournament on the ${exchange} exchange not found!`
+				i18next.t('errors.tournament_not_found', { lng, exchange })
 			)
 		}
 
@@ -129,10 +121,7 @@ class TournamentService {
 				users: [],
 				hasMore: false,
 				nextCursor: null,
-				message:
-					language === 'ru'
-						? `На данный момент нет участников!`
-						: `There are currently no members!`,
+				message: i18next.t('errors.no_members', { lng }),
 			}
 		}
 

@@ -1,5 +1,6 @@
 const Helpers = require('../helpers/helpers')
 const OrdersService = require('../service/orders-service')
+const i18next = require('i18next')
 
 class OrdersController {
 	async savedOrder(req, res, next) {
@@ -9,7 +10,7 @@ class OrdersController {
 			const { language } = req.cookies
 
 			const new_order = await OrdersService.savedOrder(
-				language,
+				req.lng,
 				user.id,
 				order,
 				exchange
@@ -33,11 +34,10 @@ class OrdersController {
 				start_time,
 				end_time,
 			} = req.body
-			const { language } = req.cookies
 			const user = req.user
 
 			const orders = await OrdersService.removedOrder(
-				language,
+				req.lng,
 				user.id,
 				start_time,
 				end_time,
@@ -70,11 +70,10 @@ class OrdersController {
 		try {
 			const { sort, search, page, limit, start_time, end_time, exchange } =
 				req.body
-			const { language } = req.cookies
 			const user = req.user
 
 			const orders = await OrdersService.getBybitSavedOrders(
-				language,
+				req.lng,
 				user.id,
 				start_time,
 				end_time,

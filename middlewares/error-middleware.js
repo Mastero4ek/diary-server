@@ -1,4 +1,4 @@
-const ApiError = require('../exceptions/api-error')
+const { ApiError } = require('../exceptions/api-error')
 const { v4: uuidv4 } = require('uuid')
 
 module.exports = function (err, req, res, next) {
