@@ -26,4 +26,10 @@ router.post(
 	bybitController.getBybitPositions
 )
 
+router.post(
+	'/bybit-profit-by-day',
+	authMiddleware,
+	bybitController.getProfitByDay
+)
+
 module.exports = router

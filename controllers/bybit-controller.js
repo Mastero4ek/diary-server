@@ -9,12 +9,6 @@ const i18next = require('i18next')
 class BybitController {
 	async getBybitOrdersPnl(req, res, next) {
 		try {
-			console.log(
-				'getBybitOrdersPnl req.lng:',
-				req.lng,
-				'exchange:',
-				req.body.exchange
-			)
 			const { exchange, sort, search, page, limit, start_time, end_time } =
 				req.body
 			const user = req.user
@@ -32,7 +26,7 @@ class BybitController {
 					lng: req.lng,
 					exchange: Helpers.capitalize(exchange),
 				})
-				console.log('i18n msg:', msg, 'lng:', req.lng)
+
 				throw ApiError.BadRequest(msg)
 			}
 
@@ -91,7 +85,7 @@ class BybitController {
 					lng: req.lng,
 					exchange: Helpers.capitalize(exchange),
 				})
-				console.log('i18n msg:', msg, 'lng:', req.lng)
+
 				throw ApiError.BadRequest(msg)
 			}
 
@@ -105,12 +99,6 @@ class BybitController {
 
 	async getBybitWallet(req, res, next) {
 		try {
-			console.log(
-				'getBybitWallet req.lng:',
-				req.lng,
-				'exchange:',
-				req.body.exchange
-			)
 			const { exchange, start_time, end_time } = req.body
 			const user = req.user
 
@@ -127,7 +115,7 @@ class BybitController {
 					lng: req.lng,
 					exchange: Helpers.capitalize(exchange),
 				})
-				console.log('i18n msg:', msg, 'lng:', req.lng)
+
 				throw ApiError.BadRequest(msg)
 			}
 
@@ -157,12 +145,6 @@ class BybitController {
 
 	async getBybitPositions(req, res, next) {
 		try {
-			console.log(
-				'getBybitPositions req.lng:',
-				req.lng,
-				'exchange:',
-				req.body.exchange
-			)
 			const { exchange, sort, search, page, limit } = req.body
 			const user = req.user
 
@@ -179,7 +161,7 @@ class BybitController {
 					lng: req.lng,
 					exchange: Helpers.capitalize(exchange),
 				})
-				console.log('i18n msg:', msg, 'lng:', req.lng)
+
 				throw ApiError.BadRequest(msg)
 			}
 
@@ -230,6 +212,56 @@ class BybitController {
 				positions: paginated_positions.items,
 				total_pages: paginated_positions.totalPages,
 				ordersByDay,
+			})
+		} catch (e) {
+			next(e)
+		}
+	}
+
+	async getProfitByDay(req, res, next) {
+		try {
+			const { exchange, start_time, end_time } = req.body
+			const user = req.user
+
+			const keys = await KeysService.findKeys(user.id, req.lng)
+			if (!keys || keys.message) {
+				throw ApiError.BadRequest(
+					i18next.t('errors.keys_not_found', { lng: req.lng })
+				)
+			}
+
+			const current_keys = keys.keys.find(item => item.name === exchange)
+			if (!current_keys || !current_keys.api || !current_keys.secret) {
+				const msg = i18next.t('errors.keys_not_configured', {
+					lng: req.lng,
+					exchange: Helpers.capitalize(exchange),
+				})
+				throw ApiError.BadRequest(msg)
+			}
+
+			const start = moment(start_time).startOf('day')
+			const end = moment(end_time).startOf('day')
+			const days = end.diff(start, 'days') + 1
+			const result = []
+
+			for (let i = 0; i < days; i++) {
+				const dayStart = start.clone().add(i, 'day').startOf('day').valueOf()
+				const dayEnd = start.clone().add(i, 'day').endOf('day').valueOf()
+				const orders = await BybitService.getBybitOrdersPnl(
+					req.lng,
+					current_keys,
+					dayStart,
+					dayEnd
+				)
+				const total = await Helpers.calculateTotalProfit(orders)
+				result.push({
+					date: start.clone().add(i, 'day').format('YYYY-MM-DD'),
+					profit: Number(total.profit) + Number(total.loss),
+				})
+			}
+
+			return res.json({
+				items: result,
 			})
 		} catch (e) {
 			next(e)
