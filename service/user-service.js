@@ -317,10 +317,8 @@ class UserService {
 			}
 
 			// Check if activation link is expired (24 hours)
-			const activationExpiry = new Date(
-				user.created_at.getTime() + 24 * 60 * 60 * 1000
-			)
-			if (new Date() > activationExpiry) {
+			const activationExpiry = moment(user.created_at).add(24, 'hours')
+			if (moment().isAfter(activationExpiry)) {
 				// Generate new activation link
 				const new_activation_link = uuid.v4()
 				user.activation_link = new_activation_link
@@ -431,7 +429,7 @@ class UserService {
 	}
 
 	async deleteInactiveUsers() {
-		const twenty_four_hours_ago = new Date(Date.now() - 24 * 60 * 60 * 1000)
+		const twenty_four_hours_ago = moment().subtract(24, 'hours').toDate()
 
 		try {
 			const users = await UserModel.find({

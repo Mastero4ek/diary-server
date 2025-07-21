@@ -21,9 +21,9 @@ class TournamentService {
 		const tournament = await TournamentModel.create({
 			name: start_date.format('MMMM'),
 			exchange: exchange,
-			start_date: start_date.toDate(),
-			end_date: end_date.toDate(),
-			registration_date: registration_date.toDate(),
+			start_date: start_date.toISOString(),
+			end_date: end_date.toISOString(),
+			registration_date: registration_date.toISOString(),
 		})
 
 		const lightblueColor = '\u001b[36m'
@@ -71,9 +71,9 @@ class TournamentService {
 		})
 
 		const users = await TournamentUserModel.find({ tournament: tournament._id })
-			.skip((page - 1) * limit) // Пропускаем юзеров до текущей страницы
-			.limit(limit) // Ограничиваем количество юзеров на странице
-			.exec() // Выполняем запрос
+			.skip((page - 1) * limit) // Skip users up to the current page
+			.limit(limit) // Limit the number of users per page
+			.exec() // Execute the query
 
 		if (!users || users.length === 0) {
 			return {
@@ -84,7 +84,7 @@ class TournamentService {
 			}
 		}
 
-		const total = await TournamentUserModel.countDocuments() // Общее количество юзеров
+		const total = await TournamentUserModel.countDocuments() // Total number of users
 
 		return { tournament, users, total }
 	}

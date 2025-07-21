@@ -43,8 +43,8 @@ app.use(
 // Rate limiting
 // Temporarily disabled rate limiting
 const apiLimiter = rateLimit({
-	windowMs: 15 * 60 * 1000, // 15 минут
-	max: 300, // ограничить каждую IP до 10 запросов за windowMs
+	windowMs: 30 * 60 * 1000, // 30 minutes
+	max: 300, // limit each IP to 10 requests per windowMs
 	handler: (req, res) => {
 		res.status(429).json({
 			message:

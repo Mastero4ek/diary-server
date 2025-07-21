@@ -25,10 +25,10 @@ module.exports = class BybitOrderDto {
 
 	calculateRoe = model => {
 		const margin = (model.closedSize * model.avgEntryPrice) / model.leverage
-		const roe = (model.closedPnl * 100) / (margin || 1) // Избегаем деления на 0
+		const roe = (model.closedPnl * 100) / (margin || 1) // Avoid division by 0
 
 		return roe
 	}
 }
 
-// TODO: НЕверный расчет roe
+// TODO: Incorrect roe calculation

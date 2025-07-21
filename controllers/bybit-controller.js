@@ -171,12 +171,15 @@ class BybitController {
 			)
 
 			const period = Array.from({ length: 7 }, (_, i) => {
-				const startOfDay = moment().startOf('isoWeek').add(i, 'days').valueOf() // Start of the day in milliseconds
+				const startOfDay = moment()
+					.startOf('isoWeek')
+					.add(i, 'days')
+					.toISOString()
 				const endOfDay = moment()
 					.startOf('isoWeek')
 					.add(i, 'days')
 					.endOf('day')
-					.valueOf() // End of the day in milliseconds
+					.toISOString()
 				const dayName = moment().startOf('isoWeek').add(i, 'days').format('ddd') // Short name of the day
 
 				return { start: startOfDay, end: endOfDay, day: dayName } // Return the object
@@ -187,8 +190,8 @@ class BybitController {
 					const orders = await BybitService.getBybitOrdersPnl(
 						req.lng,
 						current_keys,
-						periodItem.start, // Используем start для начала времени
-						periodItem.end // Используем end для конца времени
+						periodItem.start,
+						periodItem.end
 					)
 
 					const total = await Helpers.calculateTotalProfit(orders)
@@ -196,7 +199,7 @@ class BybitController {
 					return {
 						day: periodItem.day,
 						net_profit: +parseFloat(total.profit + total.loss).toFixed(2),
-					} // Возвращаем объект с днем и заказами
+					} // Return an object with the day and orders
 				})
 			)
 
@@ -245,8 +248,12 @@ class BybitController {
 			const result = []
 
 			for (let i = 0; i < days; i++) {
-				const dayStart = start.clone().add(i, 'day').startOf('day').valueOf()
-				const dayEnd = start.clone().add(i, 'day').endOf('day').valueOf()
+				const dayStart = start
+					.clone()
+					.add(i, 'day')
+					.startOf('day')
+					.toISOString()
+				const dayEnd = start.clone().add(i, 'day').endOf('day').toISOString()
 				const orders = await BybitService.getBybitOrdersPnl(
 					req.lng,
 					current_keys,

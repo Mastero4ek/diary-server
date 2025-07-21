@@ -24,7 +24,6 @@ class ApiError extends Error {
 	}
 }
 
-// Хелпер для локализации ошибок
 function localizedError(key, language = 'en', options = {}) {
 	return i18next.t(key, { lng: language, ...options })
 }

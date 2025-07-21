@@ -28,8 +28,7 @@ const Backend = require('i18next-fs-backend')
 const path = require('path')
 const langMiddleware = require('./middlewares/lang-middleware')
 
-// Инициализация i18next
-// Файлы переводов: server/locales/{ru,en}/translation.json
+// Translation files: server/locales/{ru,en}/translation.json
 
 i18next.use(Backend).init({
 	preload: ['en', 'ru'],

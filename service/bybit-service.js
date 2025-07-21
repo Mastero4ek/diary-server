@@ -93,8 +93,8 @@ class BybitService {
 			do {
 				const response = await client.getClosedPnL({
 					category: 'linear',
-					startTime: start_time,
-					endTime: end_time,
+					startTime: new Date(start_time).getTime(),
+					endTime: new Date(end_time).getTime(),
 					cursor: nextCursor || undefined,
 					limit: 50, // Добавьте ограничение для контроля записей на запрос
 				})
