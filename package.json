@@ -5,7 +5,8 @@
 	"scripts": {
 		"dev": "nodemon index.js",
 		"start": "node index.js",
-		"seed:user": "node user-seeder.js"
+		"seed:admin": "node scripts/admin-seeder.js",
+		"clean:db": "node scripts/clean-database.js"
 	},
 	"keywords": [],
 	"author": "",

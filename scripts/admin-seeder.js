@@ -3,15 +3,16 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const { v4: uuidv4 } = require('uuid')
 
-const connectDB = require('./config/database')
-const User = require('./models/user-model')
-const Keys = require('./models/keys-model')
-const Level = require('./models/level-model')
+const connectDB = require('../config/database')
+const User = require('../models/user-model')
+const Keys = require('../models/keys-model')
+const Level = require('../models/level-model')
 
 async function seedUser() {
 	await connectDB()
 
 	const email = 'slavachirkov92@gmail.com'
+	const role = 'admin'
 	const password = 'qwerty'
 	const name = 'Test'
 	const last_name = 'User'
@@ -30,6 +31,7 @@ async function seedUser() {
 	const activation_link = uuidv4()
 	const user = await User.create({
 		name,
+		role,
 		last_name,
 		email,
 		password: hashedPassword,
@@ -57,4 +59,4 @@ async function seedUser() {
 seedUser().catch(err => {
 	console.error('Seeding error:', err)
 	mongoose.disconnect()
-})
+}) 
