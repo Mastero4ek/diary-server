@@ -23,5 +23,10 @@ router.post(
 	upload.single('cover'),
 	tournamentController.createTournament
 )
+router.delete(
+	'/tournament/:id',
+	authMiddleware,
+	tournamentController.deleteTournament
+)
 
 module.exports = router

@@ -7,6 +7,9 @@ const { ApiError } = require('../exceptions/api-error')
 const i18next = require('i18next')
 const fileService = require('./file-service')
 const mongoose = require('mongoose')
+const FileModel = require('../models/file-model')
+const fs = require('fs')
+const path = require('path')
 
 class TournamentService {
 	// async createTournament(exchange) {
@@ -197,6 +200,34 @@ class TournamentService {
 
 		const tournament = await this.getTournament(exchange, lng, 1, 5)
 
+		return tournament
+	}
+
+	async removeTournament(tournamentId) {
+		const tournament = await TournamentModel.findByIdAndDelete(tournamentId)
+		if (!tournament) return null
+		// Удаляем все файлы турнира
+		const files = await FileModel.find({ tournament: tournament._id })
+		for (const file of files) {
+			const filePath = path.join(__dirname, '../uploads', file.name)
+			if (fs.existsSync(filePath)) {
+				try {
+					fs.unlinkSync(filePath)
+				} catch (err) {
+					if (err.code !== 'ENOENT') throw err
+					// Если файл не найден, просто продолжаем
+				}
+			}
+			await file.deleteOne()
+		}
+		// Удаляем всех участников турнира
+		await TournamentUserModel.deleteMany({ tournament: tournament._id })
+
+		// Удаляем турнир из массива tournaments у всех пользователей
+		await UserModel.updateMany(
+			{ 'tournaments.id': tournament._id },
+			{ $pull: { tournaments: { id: tournament._id } } }
+		)
 		return tournament
 	}
 }

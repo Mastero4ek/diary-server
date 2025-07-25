@@ -1,5 +1,6 @@
 require('dotenv').config()
 const mongoose = require('mongoose')
+const { cleanAllUploads } = require('./clean-uploads')
 
 const connectDB = require('../config/database')
 const User = require('../models/user-model')
@@ -37,7 +38,12 @@ async function cleanDatabase() {
 	}
 }
 
-cleanDatabase().catch(err => {
-	console.error(`${redColor}Cleaning error:${resetColor} ${err}`)
-	mongoose.disconnect()
-})
+async function main() {
+	await cleanDatabase()
+
+	if (process.argv.includes('--clean-uploads')) {
+		await cleanAllUploads()
+	}
+}
+
+main()

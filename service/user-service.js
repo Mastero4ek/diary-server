@@ -13,6 +13,8 @@ const { ApiError, localizedError } = require('../exceptions/api-error')
 const moment = require('moment')
 const OrderModel = require('../models/order-model')
 const i18next = require('i18next')
+const fs = require('fs')
+const path = require('path')
 
 class UserService {
 	async signUp(name, email, password, lng, source = 'local') {
@@ -420,11 +422,15 @@ class UserService {
 		await KeysModel.findOneAndDelete({ user: user._id })
 		await LevelModel.findOneAndDelete({ user: user._id })
 		await tokenService.removeToken(refresh_token)
-
-		if (user.cover) {
-			await FileModel.findOneAndDelete({ user: user._id })
+		// Удаляем все файлы пользователя
+		const files = await FileModel.find({ user: user._id })
+		for (const file of files) {
+			const filePath = path.join(__dirname, '../uploads', file.name)
+			if (fs.existsSync(filePath)) {
+				fs.unlinkSync(filePath)
+			}
+			await file.deleteOne()
 		}
-
 		return { user }
 	}
 

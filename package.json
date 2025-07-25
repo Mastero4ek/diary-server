@@ -6,7 +6,9 @@
 		"dev": "nodemon index.js",
 		"start": "node index.js",
 		"seed:admin": "node scripts/admin-seeder.js",
-		"clean:db": "node scripts/clean-database.js"
+		"clean:db": "node scripts/clean-database.js",
+		"clean:uploads": "node scripts/clean-uploads.js",
+		"clean:db:uploads": "node scripts/clean-database.js --clean-uploads"
 	},
 	"keywords": [],
 	"author": "",

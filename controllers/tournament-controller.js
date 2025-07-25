@@ -47,6 +47,21 @@ class TournamentController {
 			next(e)
 		}
 	}
+
+	async deleteTournament(req, res, next) {
+		try {
+			const { id } = req.params
+			const deleted = await tournamentService.removeTournament(id)
+
+			if (!deleted) {
+				return res.status(404).json({ message: 'Tournament not found' })
+			}
+
+			return res.json({ message: 'Tournament deleted successfully' })
+		} catch (e) {
+			next(e)
+		}
+	}
 }
 
 module.exports = new TournamentController()

@@ -192,7 +192,7 @@ class UserController {
 					const last_slash_index = existingUser.cover.lastIndexOf('/')
 					const file_name = existingUser.cover.substring(last_slash_index + 1)
 
-					await fileService.removeCover(file_name, existingUser.email, req.lng)
+					await fileService.removeCover(file_name, existingUser._id, req.lng)
 				}
 
 				await fileService.uploadCover(cover, existingUser.email, req.lng)

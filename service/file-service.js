@@ -19,7 +19,27 @@ class FileService {
 			})
 		} else {
 			// Для пользователя
-			const user = await UserModel.findOneAndUpdate(
+			const user = await UserModel.findOne({ email })
+			if (user && user.cover) {
+				const filename = user.cover.split('/').pop()
+				// Удаляем старый файл из FileModel и с диска
+				const oldFile = await FileModel.findOneAndDelete({
+					user: user._id,
+					name: filename,
+				})
+				if (oldFile) {
+					const filePath = path.join(__dirname, '../uploads', oldFile.name)
+					if (fs.existsSync(filePath)) {
+						try {
+							fs.unlinkSync(filePath)
+						} catch (err) {
+							if (err.code !== 'ENOENT') throw err
+							// Если файл не найден, просто продолжаем
+						}
+					}
+				}
+			}
+			const updatedUser = await UserModel.findOneAndUpdate(
 				{ email },
 				{
 					$set: {
@@ -30,17 +50,17 @@ class FileService {
 				{ returnDocument: 'after' }
 			)
 			file = await FileModel.create({
-				user: user._id,
+				user: updatedUser._id,
 				tournament: null,
 				name: cover.filename,
 				size: cover.size,
 				mimetype: cover.mimetype,
 			})
-			await user.save()
+			await updatedUser.save()
 			// Обновляем cover во всех TournamentUser
 			await TournamentUserModel.updateMany(
-				{ id: user._id },
-				{ $set: { cover: user.cover } }
+				{ id: updatedUser._id },
+				{ $set: { cover: updatedUser.cover } }
 			)
 		}
 		await file.save()
