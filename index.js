@@ -30,6 +30,11 @@ const langMiddleware = require('./middlewares/lang-middleware')
 
 // Translation files: server/locales/{ru,en}/translation.json
 
+const greenColor = '\x1b[32m'
+const redColor = '\x1b[31m'
+const resetColor = '\x1b[0m'
+const blueColor = '\x1b[34m'
+
 i18next.use(Backend).init({
 	preload: ['en', 'ru'],
 	fallbackLng: 'en',
@@ -88,7 +93,9 @@ const start = async () => {
 		await initCronJobs()
 
 		app.listen(PORT, () => {
-			console.log(`Successfully connected to Server on port ${PORT}!`)
+			console.log(
+				`${greenColor}Successfully connected to Server on port:${resetColor} ${blueColor}${PORT}${resetColor}`
+			)
 		})
 	} catch (e) {
 		console.log(e)

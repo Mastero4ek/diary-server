@@ -27,7 +27,7 @@ const initCronJobs = () => {
 	// Run every hour
 	cron.schedule('0 * * * *', () => {
 		userService.deleteInactiveUsers()
-		scheduleTournamentCreation()
+		// scheduleTournamentCreation()
 	})
 }
 

@@ -1,5 +1,10 @@
 const Redis = require('ioredis')
 
+const greenColor = '\x1b[32m'
+const redColor = '\x1b[31m'
+const resetColor = '\x1b[0m'
+const blueColor = '\x1b[34m'
+
 // Initialize Redis
 let redis = null
 
@@ -14,14 +19,16 @@ try {
 	})
 
 	redis.on('error', err => {
-		console.error('Redis connection error:', err)
+		console.error(`${redColor}Redis connection error:${resetColor} ${err}`)
 	})
 
 	redis.on('connect', () => {
-		console.log('Successfully connected to Redis on port 6379!')
+		console.log(
+			`${greenColor}Successfully connected to Redis on port:${resetColor} ${blueColor}6379${resetColor}`
+		)
 	})
 } catch (error) {
-	console.error('Failed to initialize Redis:', error)
+	console.error(`${redColor}Failed to initialize Redis:${resetColor} ${error}`)
 }
 
 module.exports = redis
