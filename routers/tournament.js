@@ -23,6 +23,11 @@ router.post(
 	upload.single('cover'),
 	tournamentController.createTournament
 )
+router.post(
+	'/remove_tournament_user',
+	authMiddleware,
+	tournamentController.removeTournamentUser
+)
 router.delete(
 	'/tournament/:id',
 	authMiddleware,

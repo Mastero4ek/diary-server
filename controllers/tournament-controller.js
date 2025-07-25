@@ -62,6 +62,19 @@ class TournamentController {
 			next(e)
 		}
 	}
+
+	async removeTournamentUser(req, res, next) {
+		try {
+			const { tournamentId, userId } = req.body
+			const result = await tournamentService.removeTournamentUser(
+				tournamentId,
+				userId
+			)
+			return res.json(result)
+		} catch (e) {
+			next(e)
+		}
+	}
 }
 
 module.exports = new TournamentController()

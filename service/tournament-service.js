@@ -230,6 +230,29 @@ class TournamentService {
 		)
 		return tournament
 	}
+
+	async removeTournamentUser(tournamentId, userId) {
+		const tournament = await TournamentModel.findById(tournamentId)
+		if (!tournament) {
+			throw ApiError.BadRequest('Tournament not found')
+		}
+
+		const user = await UserModel.findById(userId)
+		if (!user) {
+			throw ApiError.BadRequest('User not found')
+		}
+
+		await TournamentUserModel.deleteOne({
+			tournament: tournamentId,
+			id: userId,
+		})
+
+		await UserModel.updateOne(
+			{ _id: userId },
+			{ $pull: { tournaments: { id: tournamentId } } }
+		)
+		return { message: 'User removed from tournament' }
+	}
 }
 
 module.exports = new TournamentService()
