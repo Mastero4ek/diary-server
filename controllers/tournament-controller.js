@@ -35,6 +35,18 @@ class TournamentController {
 			next(e)
 		}
 	}
+
+	async createTournament(req, res, next) {
+		try {
+			const tournament = await tournamentService.createTournament(
+				req.body,
+				req.file
+			)
+			return res.json(tournament)
+		} catch (e) {
+			next(e)
+		}
+	}
 }
 
 module.exports = new TournamentController()

@@ -12,6 +12,12 @@ const UserSchema = new Schema({
 	change_password: { type: Boolean, default: true },
 	phone: { type: Number, default: null },
 	cover: { type: String, default: null },
+	tournaments: [
+		{
+			exchange: { type: String, required: true },
+			id: { type: Schema.Types.ObjectId, ref: 'Tournament', required: true },
+		},
+	],
 	google: {
 		type: {
 			id: { type: String },

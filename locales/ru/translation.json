@@ -23,7 +23,9 @@
 		"activation_link_expired": "Срок действия ссылки для активации истек. Новая ссылка отправлена на вашу почту.",
 		"failed_create_user": "Не удалось создать пользователя!",
 		"failed_activate_account": "Не удалось активировать аккаунт!",
-		"api_key_invalid": "API-ключ недействителен."
+		"api_key_invalid": "API-ключ недействителен.",
+		"tournament_already_exists": "Соревнование на бирже {{exchange}} уже существует!",
+		"already_joined": "Вы уже присоединились к этому соревнованию!"
 	},
 	"success": {
 		"file_saved": "Файл успешно сохранен!",

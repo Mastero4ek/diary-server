@@ -29,6 +29,7 @@ router.post(
 router.get('/refresh', userController.refresh)
 router.post('/logout', userController.logout)
 router.get('/activate/:link', userController.activate)
+router.get('/user/:id', userController.getUser)
 
 router.post(
 	'/edit-user',

@@ -1,31 +1,49 @@
 const FileModel = require('../models/file-model')
 const UserModel = require('../models/user-model')
+const TournamentUserModel = require('../models/tournament_user-model')
 const fs = require('fs')
 const path = require('path')
 const i18next = require('i18next')
 
 class FileService {
-	async uploadCover(cover, email, lng) {
-		const user = await UserModel.findOneAndUpdate(
-			{ email },
-			{
-				$set: {
-					cover: process.env.API_URL + '/uploads/' + path.basename(cover.path),
+	async uploadCover(cover, email, lng, tournamentId = null) {
+		let file
+		if (tournamentId) {
+			// Для турнира
+			file = await FileModel.create({
+				user: null,
+				tournament: tournamentId,
+				name: cover.filename,
+				size: cover.size,
+				mimetype: cover.mimetype,
+			})
+		} else {
+			// Для пользователя
+			const user = await UserModel.findOneAndUpdate(
+				{ email },
+				{
+					$set: {
+						cover:
+							process.env.API_URL + '/uploads/' + path.basename(cover.path),
+					},
 				},
-			},
-			{ returnDocument: 'after' }
-		)
-
-		const file = await FileModel.create({
-			user: user._id,
-			name: cover.filename,
-			size: cover.size,
-			mimetype: cover.mimetype,
-		})
-
+				{ returnDocument: 'after' }
+			)
+			file = await FileModel.create({
+				user: user._id,
+				tournament: null,
+				name: cover.filename,
+				size: cover.size,
+				mimetype: cover.mimetype,
+			})
+			await user.save()
+			// Обновляем cover во всех TournamentUser
+			await TournamentUserModel.updateMany(
+				{ id: user._id },
+				{ $set: { cover: user.cover } }
+			)
+		}
 		await file.save()
-		await user.save()
-
 		return {
 			message: i18next.t('success.file_saved', { lng }),
 		}
@@ -53,7 +71,11 @@ class FileService {
 			},
 			{ returnDocument: 'after' }
 		)
-
+		// Обновляем cover во всех TournamentUser
+		await TournamentUserModel.updateMany(
+			{ id: userId },
+			{ $set: { cover: null } }
+		)
 		return {
 			message: i18next.t('success.file_deleted', { lng }),
 		}

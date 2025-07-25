@@ -23,7 +23,9 @@
 		"activation_link_expired": "Activation link has expired. A new activation link has been sent to your email.",
 		"failed_create_user": "Failed to create user!",
 		"failed_activate_account": "Failed to activate account!",
-		"api_key_invalid": "API key is invalid."
+		"api_key_invalid": "API key is invalid.",
+		"tournament_already_exists": "Tournament on the {{exchange}} exchange already exists!",
+		"already_joined": "You have already joined this tournament!"
 	},
 	"success": {
 		"file_saved": "File saved successfully!",

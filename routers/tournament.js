@@ -4,6 +4,7 @@ const authMiddleware = require('../middlewares/auth-middleware')
 const tournamentController = require('../controllers/tournament-controller')
 const { checkSchema } = require('express-validator')
 const ValidationSchema = require('../validation/validation-schema')
+const upload = require('../config/multer')
 
 router.post(
 	'/tournament',
@@ -15,6 +16,12 @@ router.post(
 	'/add_tournament_user',
 	authMiddleware,
 	tournamentController.addTournamentUser
+)
+router.post(
+	'/create_tournament',
+	authMiddleware,
+	upload.single('cover'),
+	tournamentController.createTournament
 )
 
 module.exports = router

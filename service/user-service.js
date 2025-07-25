@@ -476,7 +476,7 @@ class UserService {
 		}
 	}
 
-	async getUserData(userId) {
+	async getUser(userId) {
 		try {
 			const user = await UserModel.findById(userId)
 			if (!user) {

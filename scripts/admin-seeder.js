@@ -16,7 +16,7 @@ const blueColor = '\x1b[34m'
 async function seedUser() {
 	await connectDB()
 
-	const email = 'slavachirkov92@gmail.com'
+	const email = 'tdiary2023@gmail.com'
 	const role = 'admin'
 	const password = '123456'
 	const name = 'Admin'

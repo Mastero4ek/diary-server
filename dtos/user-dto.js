@@ -12,6 +12,7 @@ module.exports = class UserDto {
 	change_password
 	google
 	github
+	tournaments
 
 	constructor(model) {
 		this.id = model._id || model.id
@@ -27,5 +28,6 @@ module.exports = class UserDto {
 		this.change_password = model.change_password
 		this.google = model.google
 		this.github = model.github
+		this.tournaments = model.tournaments || []
 	}
 }
