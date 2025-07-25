@@ -13,7 +13,7 @@ module.exports = class BybitOrderDto {
 	constructor(model) {
 		this.id = model.orderId
 		this.symbol = model.symbol
-		this.closed_time = +model.updatedTime
+		this.closed_time = +model.updatedTime // reverted: Bybit API returns updatedTime, not closedTime
 		this.open_time = +model.createdTime
 		this.direction = model.side === 'Buy' ? 'short' : 'long'
 		this.leverage = +model.leverage

@@ -30,11 +30,17 @@ class BybitController {
 				throw ApiError.BadRequest(msg)
 			}
 
+			const startMsPnl =
+				typeof start_time === 'string'
+					? new Date(start_time).getTime()
+					: start_time
+			const endMsPnl =
+				typeof end_time === 'string' ? new Date(end_time).getTime() : end_time
 			const orders = await BybitService.getBybitOrdersPnl(
 				req.lng,
 				current_keys,
-				start_time,
-				end_time
+				startMsPnl,
+				endMsPnl
 			)
 
 			const paginated_orders = await Helpers.paginate(
@@ -119,13 +125,19 @@ class BybitController {
 				throw ApiError.BadRequest(msg)
 			}
 
+			const startMsWallet =
+				typeof start_time === 'string'
+					? new Date(start_time).getTime()
+					: start_time
+			const endMsWallet =
+				typeof end_time === 'string' ? new Date(end_time).getTime() : end_time
 			const wallet = await BybitService.getBybitWallet(req.lng, current_keys)
 
 			const orders = await BybitService.getBybitOrdersPnl(
 				req.lng,
 				current_keys,
-				start_time,
-				end_time
+				startMsWallet,
+				endMsWallet
 			)
 
 			const total = await Helpers.calculateTotalProfit(orders)
@@ -165,6 +177,12 @@ class BybitController {
 				throw ApiError.BadRequest(msg)
 			}
 
+			const startMsPositions =
+				typeof start_time === 'string'
+					? new Date(start_time).getTime()
+					: start_time
+			const endMsPositions =
+				typeof end_time === 'string' ? new Date(end_time).getTime() : end_time
 			const positions = await BybitService.getBybitPositions(
 				req.lng,
 				current_keys
@@ -244,28 +262,48 @@ class BybitController {
 
 			const start = moment(start_time).startOf('day')
 			const end = moment(end_time).startOf('day')
-			const days = end.diff(start, 'days') + 1
-			const result = []
+			// const days = end.diff(start, 'days') + 1
 
-			for (let i = 0; i < days; i++) {
-				const dayStart = start
-					.clone()
-					.add(i, 'day')
+			const startMs = start.valueOf()
+			const endMs = end.endOf('day').valueOf()
+
+			// Получаем все ордера за диапазон одним вызовом
+			const orders = await BybitService.getBybitOrdersPnl(
+				req.lng,
+				current_keys,
+				startMs,
+				endMs
+			)
+
+			// Группируем ордера по дням (UTC)
+			const grouped = {}
+			for (const o of orders) {
+				const day = moment(o.closed_time)
+					.utc()
 					.startOf('day')
-					.toISOString()
-				const dayEnd = start.clone().add(i, 'day').endOf('day').toISOString()
-				const orders = await BybitService.getBybitOrdersPnl(
-					req.lng,
-					current_keys,
-					dayStart,
-					dayEnd
-				)
-				const total = await Helpers.calculateTotalProfit(orders)
-				result.push({
-					date: start.clone().add(i, 'day').format('YYYY-MM-DD'),
-					profit: Number(total.profit) + Number(total.loss),
-				})
+					.format('YYYY-MM-DD')
+				if (!grouped[day]) grouped[day] = []
+				grouped[day].push(o)
 			}
+
+			// Вычисляем min/max дату среди всех ордеров
+			const closedTimes = orders.map(o => o.closed_time)
+			const minDate = moment(Math.min(...closedTimes))
+				.utc()
+				.startOf('day')
+			const maxDate = moment(Math.max(...closedTimes))
+				.utc()
+				.startOf('day')
+			const days = maxDate.diff(minDate, 'days') + 1
+
+			let result = []
+			for (let i = 0; i < days; i++) {
+				const day = minDate.clone().add(i, 'day').format('YYYY-MM-DD')
+				const ordersForDay = grouped[day] || []
+				const profit = ordersForDay.reduce((sum, o) => sum + o.pnl, 0)
+				result.push({ date: day, profit, count: ordersForDay.length })
+			}
+			const totalProfitByDay = result.reduce((sum, d) => sum + d.profit, 0)
 
 			return res.json({
 				items: result,
